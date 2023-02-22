@@ -18,7 +18,9 @@
         "symfony/framework-bundle": "5.4.*",
         "symfony/monolog-bundle": "^3.8",
         "symfony/runtime": "5.4.*",
-        "symfony/yaml": "5.4.*"
+        "symfony/yaml": "5.4.*",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "config": {
         "allow-plugins": {
