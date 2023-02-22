@@ -1,0 +1,40 @@
+parameters:
+  blockchain: {
+    3: {
+      parser: "EtherscanEventParser",
+      apiDomain: "api-ropsten.etherscan.io",
+      apiKey: "ZJMXDUG8ZK5NY139B1EYFTZ5R9WFZ19X89",
+      rpcUrl: "",
+      explorerUrl: "https://ropsten.etherscan.io",
+      currencySymbol: "ETH",
+      contractAddress: "0xabb57e7e2a74a51b90acca2cacab2536fc18466f",
+      signerAddress: "0x4c4c3ac32fd4999b0d4935e222c6d6f266d65ad1",
+      signerPassword: "12345",
+      chainName: "Ropsten Testnet"
+    },
+    5: {
+      parser: "EtherscanEventParser",
+      apiDomain: "api-goerli.etherscan.io",
+      apiKey: "ZJMXDUG8ZK5NY139B1EYFTZ5R9WFZ19X89",
+      rpcUrl: "",
+      explorerUrl: "https://goerli.etherscan.io",
+      currencySymbol: "ETH",
+      contractAddress: "0xab45eee5b9344483bcdb875acf07da87c88f620c",
+      signerAddress: "0x4c4c3ac32fd4999b0d4935e222c6d6f266d65ad1",
+      signerPassword: "12345",
+      chainName: "Goerli Testnet"
+    },
+    97: {
+      parser: "EtherscanEventParser",
+      apiDomain: "api-testnet.bscscan.com",
+      apiKey: "PTB59VCURZGDS3QEMEMAA7XG4S7G9MZVN4",
+      rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      explorerUrl: "https://testnet.bscscan.com",
+      currencySymbol: "BNB",
+      contractAddress: "0xe766c8215d890d1ab92d7c40773f221ebe58669d",
+      signerAddress: "0x4c4c3ac32fd4999b0d4935e222c6d6f266d65ad1",
+      signerPassword: "12345",
+      chainName: "BSC Testnet"
+    }
+  }
+  gethAddress: "http://localhost:8545/"

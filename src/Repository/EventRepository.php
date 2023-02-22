@@ -5,8 +5,6 @@ namespace App\Repository;
 use App\Entity\Event;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 
 /**
  * Class EventRepository

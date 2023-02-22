@@ -1,0 +1,23 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  App\Service\Doctrine\RepositoryFactory: ~
+
+  App\Repository\EventRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Event'
+  App\Repository\UserRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\User'
+  App\Repository\LastParsedBlockRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\LastParsedBlock'
