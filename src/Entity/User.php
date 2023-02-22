@@ -30,7 +30,7 @@ class User implements JsonSerializable
      * ETH-адрес пользователя
      *
      * @var string
-     * @ORM\Column(type="string", length=42)
+     * @ORM\Column(type="string", length=42, nullable=true)
      */
     private $address;
     /**
@@ -60,9 +60,9 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
