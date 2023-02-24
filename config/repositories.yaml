@@ -6,18 +6,93 @@ services:
 
   App\Service\Doctrine\RepositoryFactory: ~
 
+  App\Repository\AchievementDescriptionRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\AchievementDescription'
+  App\Repository\AchievementRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Achievement'
+  App\Repository\BabtTokenRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\BabtToken'
   App\Repository\EventRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
     arguments:
       - 'App\Entity\Event'
-  App\Repository\UserRepository:
+  App\Repository\GameAdminRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
     arguments:
-      - 'App\Entity\User'
+      - 'App\Entity\GameAdmin'
+  App\Repository\GameDescriptionRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\GameDescription'
+  App\Repository\GameRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Game'
+  App\Repository\IdNftRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\IdNft'
   App\Repository\LastParsedBlockRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
     arguments:
       - 'App\Entity\LastParsedBlock'
+  App\Repository\QuestDescriptionRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\QuestDescription'
+  App\Repository\QuestRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Quest'
+  App\Repository\QuestTaskDescriptionRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\QuestTaskDescription'
+  App\Repository\QuestTaskRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\QuestTask'
+  App\Repository\UserAchievementRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\UserAchievement'
+  App\Repository\UserQuestRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\UserQuest'
+  App\Repository\UserQuestTaskRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\UserQuestTask'
+  App\Repository\UserReferralRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\UserReferral'
+  App\Repository\UserRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\User'
