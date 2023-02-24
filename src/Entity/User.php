@@ -48,6 +48,26 @@ class User implements JsonSerializable
      * @ORM\OneToMany(targetEntity="UserAchievement", mappedBy="user")
      */
     private $userAchievements;
+    /**
+     * @var UserQuest[]
+     * @ORM\OneToMany(targetEntity="UserQuest", mappedBy="quest")
+     */
+    private $userQuests;
+    /**
+     * @var UserQuestTask[]
+     * @ORM\OneToMany(targetEntity="UserQuestTask", mappedBy="questTask")
+     */
+    private $userQuestTasks;
+    /**
+     * @var UserReferral[]
+     * @ORM\OneToMany(targetEntity="UserReferral", mappedBy="user")
+     */
+    private $referrals;
+    /**
+     * @var UserReferral[]
+     * @ORM\OneToMany(targetEntity="UserReferral", mappedBy="referral")
+     */
+    private $partners;
 
     /**
      * User constructor.
@@ -55,6 +75,10 @@ class User implements JsonSerializable
     public function __construct() {
         $this->babtTokens = new ArrayCollection();
         $this->userAchievements = new ArrayCollection();
+        $this->userQuests = new ArrayCollection();
+        $this->userQuestTasks = new ArrayCollection();
+        $this->referrals = new ArrayCollection();
+        $this->partners = new ArrayCollection();
     }
 
     /**
@@ -115,6 +139,38 @@ class User implements JsonSerializable
     public function getUserAchievements(): Collection
     {
         return $this->userAchievements;
+    }
+
+    /**
+     * @return Collection|UserQuest[]
+     */
+    public function getUserQuests(): Collection
+    {
+        return $this->userQuests;
+    }
+
+    /**
+     * @return Collection|UserQuestTask[]
+     */
+    public function getUserQuestTasks(): Collection
+    {
+        return $this->userQuestTasks;
+    }
+
+    /**
+     * @return Collection|UserReferral[]
+     */
+    public function getReferrals(): Collection
+    {
+        return $this->referrals;
+    }
+
+    /**
+     * @return Collection|UserReferral[]
+     */
+    public function getPartners(): Collection
+    {
+        return $this->partners;
     }
 
     /**

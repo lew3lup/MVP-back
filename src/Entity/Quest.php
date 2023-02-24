@@ -47,6 +47,11 @@ class Quest
      * @ORM\OneToMany(targetEntity="QuestTask", mappedBy="quest")
      */
     private $tasks;
+    /**
+     * @var UserQuest[]
+     * @ORM\OneToMany(targetEntity="UserQuest", mappedBy="quest")
+     */
+    private $userQuests;
 
     /**
      * Quest constructor.
@@ -55,6 +60,7 @@ class Quest
     {
         $this->descriptions = new ArrayCollection();
         $this->tasks = new ArrayCollection();
+        $this->userQuests = new ArrayCollection();
     }
 
     /**
@@ -107,5 +113,13 @@ class Quest
     public function getDescriptions(): Collection
     {
         return $this->descriptions;
+    }
+
+    /**
+     * @return Collection|UserQuest[]
+     */
+    public function getUserQuests(): Collection
+    {
+        return $this->userQuests;
     }
 }

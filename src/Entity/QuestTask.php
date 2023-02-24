@@ -34,6 +34,11 @@ class QuestTask
      * @ORM\OneToMany(targetEntity="QuestTaskDescription", mappedBy="questTask")
      */
     private $descriptions;
+    /**
+     * @var UserQuestTask[]
+     * @ORM\OneToMany(targetEntity="UserQuestTask", mappedBy="questTask")
+     */
+    private $userQuestTasks;
 
     /**
      * QuestTask constructor.
@@ -41,6 +46,7 @@ class QuestTask
     public function __construct()
     {
         $this->descriptions = new ArrayCollection();
+        $this->userQuestTasks = new ArrayCollection();
     }
 
     /**
@@ -75,5 +81,13 @@ class QuestTask
     public function getDescriptions(): Collection
     {
         return $this->descriptions;
+    }
+
+    /**
+     * @return Collection|UserQuestTask[]
+     */
+    public function getUserQuestTasks(): Collection
+    {
+        return $this->userQuestTasks;
     }
 }
