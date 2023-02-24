@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="App\Repository\BabtTokenRepository")
  *
  * Class BabtToken
- * @package App\Model\Event\Entity
+ * @package App\Entity
  */
 class BabtToken
 {

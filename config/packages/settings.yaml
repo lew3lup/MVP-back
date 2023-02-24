@@ -1,0 +1,4 @@
+parameters:
+  jwtSecretKey: '%env(JWT_SECRET_KEY)%'
+  eventsParsingIterations: '%env(EVENTS_PARSING_ITERATIONS)%'
+  babtParsingIterations: '%env(BABT_PARSING_ITERATIONS)%'

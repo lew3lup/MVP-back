@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="App\Repository\LastParsedBlockRepository")
  *
  * Class LastParsedBlock
- * @package App\Model\Event\Entity
+ * @package App\Entity
  */
 class LastParsedBlock
 {

@@ -15,7 +15,7 @@ use JsonSerializable;
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  *
  * Class User
- * @package App\Model\Event\Entity
+ * @package App\Entity
  */
 class User implements JsonSerializable
 {
@@ -43,12 +43,18 @@ class User implements JsonSerializable
      * @ORM\OneToMany(targetEntity="BabtToken", mappedBy="user")
      */
     private $babtTokens;
+    /**
+     * @var UserAchievement[]
+     * @ORM\OneToMany(targetEntity="UserAchievement", mappedBy="user")
+     */
+    private $userAchievements;
 
     /**
      * User constructor.
      */
     public function __construct() {
         $this->babtTokens = new ArrayCollection();
+        $this->userAchievements = new ArrayCollection();
     }
 
     /**
@@ -101,6 +107,14 @@ class User implements JsonSerializable
     public function getBabtTokens(): Collection
     {
         return $this->babtTokens;
+    }
+
+    /**
+     * @return Collection|UserAchievement[]
+     */
+    public function getUserAchievements(): Collection
+    {
+        return $this->userAchievements;
     }
 
     /**
