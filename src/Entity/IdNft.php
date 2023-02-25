@@ -13,5 +13,21 @@ namespace App\Entity;
  */
 class IdNft
 {
+    /**
+     * @var int
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
+    //ToDo
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
 }
