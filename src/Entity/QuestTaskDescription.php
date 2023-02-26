@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * Сущность описания квестового задания на одном из языков
  *

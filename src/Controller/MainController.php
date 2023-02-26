@@ -2,14 +2,13 @@
 
 namespace App\Controller;
 
-use App\Exception\NotFoundException;
 use App\Exception\RequestDataException;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,14 +16,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     /**
-     * @Route("get-login-message", name="get-login-message", methods={"POST"})
+     * @Route("get-metamask-login-message", name="get-metamask-login-message", methods={"POST"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
      * @param UserService $userService
      * @return JsonResponse
      */
-    public function getLoginMessage(
+    public function getMetamaskLoginMessage(
         Request $request,
         EntityManagerInterface $em,
         UserService $userService
@@ -33,7 +32,7 @@ class MainController extends AbstractController
         if (!$address) {
             throw new RequestDataException();
         }
-        $loginMessage = $userService->getLoginMessage($address);
+        $loginMessage = $userService->getMetamaskLoginMessage($address);
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -42,14 +41,14 @@ class MainController extends AbstractController
     }
 
     /**
-     * @Route("login", name="login", methods={"POST"})
+     * @Route("metamask-login", name="metamask-login", methods={"POST"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
      * @param UserService $userService
      * @return JsonResponse
      */
-    public function login(
+    public function metamaskLogin(
         Request $request,
         EntityManagerInterface $em,
         UserService $userService
@@ -59,13 +58,50 @@ class MainController extends AbstractController
         if (!$address || !$signature) {
             throw new RequestDataException();
         }
-        [$user, $token] = $userService->login($address, $signature);
+        [$user, $token] = $userService->metamaskLogin($address, $signature);
         $em->flush();
         return $this->json([
             'type' => 'success',
             'token' => $token,
             'user' => $user
         ]);
+    }
+
+    /**
+     * @Route("get-google-login-url", name="get-google-login-url", methods={"GET"})
+     *
+     * @param UserService $userService
+     * @return JsonResponse
+     */
+    public function getGoogleLoginUrl(UserService $userService): JsonResponse
+    {
+        return $this->json([
+            'type' => 'success',
+            'link' => $userService->getGoogleLoginUrl()
+        ]);
+    }
+
+    /**
+     * @Route("google-redirect", name="google-redirect", methods={"GET"})
+     *
+     * @param Request $request
+     * @param ParameterBagInterface $parameterBag
+     * @param EntityManagerInterface $em
+     * @param UserService $userService
+     * @return RedirectResponse
+     */
+    public function googleRedirect(
+        Request $request,
+        ParameterBagInterface $parameterBag,
+        EntityManagerInterface $em,
+        UserService $userService
+    ): RedirectResponse {
+        if ($request->get('code')) {
+            [$user, $token] = $userService->googleLogin($request->get('code'));
+            $em->flush();
+        }
+        //ToDo: передавать в редиректе токен
+        return $this->redirect($parameterBag->get('frontDomain'));
     }
 
     /**
@@ -114,8 +150,9 @@ class MainController extends AbstractController
     }
 
     /**
-     * @Route("get-login-message", methods={"OPTIONS"})
-     * @Route("login", methods={"OPTIONS"})
+     * @Route("get-metamask-login-message", methods={"OPTIONS"})
+     * @Route("metamask-login", methods={"OPTIONS"})
+     * @Route("get-google-login-url", methods={"OPTIONS"})
      * @Route("get-user-data", methods={"OPTIONS"})
      * @Route("service-login", methods={"OPTIONS"})
      * @Route("get-service-login-redirect", methods={"OPTIONS"})

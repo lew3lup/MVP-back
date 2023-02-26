@@ -16,11 +16,29 @@ use Doctrine\ORM\EntityRepository;
 class UserRepository extends EntityRepository
 {
     /**
+     * @param int $id
+     * @return User|null
+     */
+    public function findOneById(int $id): ?User
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
+
+    /**
      * @param string $address
      * @return User|null
      */
     public function findOneByAddress(string $address): ?User
     {
         return $this->findOneBy(['address' => $address]);
+    }
+
+    /**
+     * @param string $email
+     * @return User|null
+     */
+    public function findOneByEmail(string $email): ?User
+    {
+        return $this->findOneBy(['email' => $email]);
     }
 }

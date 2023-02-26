@@ -34,6 +34,16 @@ class User implements JsonSerializable
      */
     private $address;
     /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $email;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $name;
+    /**
      * @var DateTimeImmutable
      * @ORM\Column(type="datetime_immutable", name="registered_at")
      */
@@ -104,6 +114,42 @@ class User implements JsonSerializable
     public function setAddress(string $address): User
     {
         $this->address = $address;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     * @return User
+     */
+    public function setEmail(string $email): User
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return User
+     */
+    public function setName(string $name): User
+    {
+        $this->name = $name;
         return $this;
     }
 

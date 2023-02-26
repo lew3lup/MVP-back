@@ -12,11 +12,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Google\Client;
+use Google_Service_Oauth2;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class UserService
 {
+    /** @var Client */
+    private $googleClient;
     /** @var EntityManagerInterface */
     private $em;
     /** @var UserRepository */
@@ -30,15 +34,18 @@ class UserService
 
     /**
      * UserService constructor.
+     * @param Client $googleClient
      * @param EntityManagerInterface $em
      * @param UserRepository $userRepo
      * @param ParameterBagInterface $parameterBag
      */
     public function __construct(
+        Client $googleClient,
         EntityManagerInterface $em,
         UserRepository $userRepo,
         ParameterBagInterface $parameterBag
     ) {
+        $this->googleClient = $googleClient;
         $this->em = $em;
         $this->userRepo = $userRepo;
         $this->parameterBag = $parameterBag;
@@ -50,7 +57,7 @@ class UserService
      * @param string $address
      * @return User
      */
-    public function getOrAddUser(string $address): User
+    private function getOrAddUserByAddress(string $address): User
     {
         $address = strtolower($address);
         if (!$this->checkEthAddress($address)) {
@@ -68,12 +75,29 @@ class UserService
     }
 
     /**
+     * @param string $email
+     * @return User
+     */
+    private function getOrAddUserByEmail(string $email): User
+    {
+        $user = $this->userRepo->findOneByEmail($email);
+        if (!$user) {
+            $user = (new User())
+                ->setEmail($email)
+                ->setRegisteredAt(new DateTimeImmutable())
+            ;
+            $this->em->persist($user);
+        }
+        return $user;
+    }
+
+    /**
      * @param string $address
      * @return string
      */
-    public function getLoginMessage(string $address): string
+    public function getMetamaskLoginMessage(string $address): string
     {
-        $user = $this->getOrAddUser($address);
+        $user = $this->getOrAddUserByAddress($address);
         $message = $this->generateRandomString(
             '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             100
@@ -87,9 +111,9 @@ class UserService
      * @param string $signature
      * @return array
      */
-    public function login(string $address, string $signature): array
+    public function metamaskLogin(string $address, string $signature): array
     {
-        $user = $this->getOrAddUser($address);
+        $user = $this->getOrAddUserByAddress($address);
         //Получаем строку, которая давалась этому адресу на подпись, из кэша
         $messageKey = $this->getMessageKey($user);
         $message = $this->redis->get($messageKey);
@@ -111,6 +135,38 @@ class UserService
     }
 
     /**
+     * @return string
+     */
+    public function getGoogleLoginUrl(): string
+    {
+        $this->googleClient->addScope('email');
+        $this->googleClient->addScope('profile');
+        return $this->googleClient->createAuthUrl();
+    }
+
+    /**
+     * @param string $code
+     * @return array
+     */
+    public function googleLogin(string $code): array
+    {
+        $token = $this->googleClient->fetchAccessTokenWithAuthCode($code);
+        $this->googleClient->setAccessToken($token['access_token']);
+        $googleOauth = new Google_Service_Oauth2($this->googleClient);
+        $googleAccountInfo = $googleOauth->userinfo->get();
+        $email = $googleAccountInfo->email;
+        $name = $googleAccountInfo->name;
+        if (!$email) {
+            throw new ForbiddenException();
+        }
+        $user = $this->getOrAddUserByEmail($email);
+        if ($name && !$user->getName()) {
+            $user->setName($name);
+        }
+        return [$user, $this->getAuthorizationToken($user)];
+    }
+
+    /**
      * @param string $message
      * @param string $signature
      * @return array
@@ -127,7 +183,7 @@ class UserService
         if (!$address) {
             throw new ForbiddenException();
         }
-        $user = $this->getOrAddUser($address);
+        $user = $this->getOrAddUserByAddress($address);
         return [$user, $this->getAuthorizationToken($user)];
     }
 
@@ -171,7 +227,7 @@ class UserService
         if ($data->nbf > $now->getTimestamp() || $data->exp < $now->getTimestamp()) {
             throw new ForbiddenException('Token expired');
         }
-        $user = $this->userRepo->findOneByAddress($data->userAddress);
+        $user = $this->userRepo->findOneById($data->userId);
         if (!$user) {
             throw new ForbiddenException();
         }
@@ -206,7 +262,7 @@ class UserService
             'iat' => $issuedAt->getTimestamp(),
             'nbf' => $issuedAt->getTimestamp(),
             'exp' => $expireAt->getTimestamp(),
-            'userAddress' => $user->getAddress()
+            'userId' => $user->getId()
         ];
         return JWT::encode($data, $secretKey, 'HS512');
     }

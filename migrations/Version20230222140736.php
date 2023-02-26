@@ -44,9 +44,12 @@ final class Version20230222140736 extends AbstractMigration
         $this->addSql('CREATE TABLE users (
             id serial not null,
             address varchar (42) null,
+            email text null,
+            name text null,
             registered_at timestamp(0) default now() not null,
             PRIMARY KEY (id),
-            UNIQUE (address)
+            UNIQUE (address),
+            UNIQUE (email)
         )');
 
         //Game
