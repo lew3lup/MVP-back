@@ -132,6 +132,33 @@ class MainController extends AbstractController
     }
 
     /**
+     * @Route("link-metamask", name="link-metamask", methods={"POST"})
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param UserService $userService
+     * @return JsonResponse
+     */
+    public function linkMetamask(
+        Request $request,
+        EntityManagerInterface $em,
+        UserService $userService
+    ): JsonResponse {
+        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $address = $request->request->get('address');
+        $signature = $request->request->get('signature');
+        if (!$address || !$signature) {
+            throw new RequestDataException();
+        }
+        $userService->linkMetamask($user, $address, $signature);
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'user' => $user
+        ]);
+    }
+
+    /**
      * @Route("get-blockchain-config", name="get-blockchain-config", methods={"GET"})
      *
      * @param ParameterBagInterface $parameterBag
@@ -161,6 +188,7 @@ class MainController extends AbstractController
     /**
      * @Route("get-metamask-login-message", methods={"OPTIONS"})
      * @Route("metamask-login", methods={"OPTIONS"})
+     * @Route("link-metamask", methods={"OPTIONS"})
      * @Route("get-google-login-url", methods={"OPTIONS"})
      * @Route("get-user-data", methods={"OPTIONS"})
      * @Route("service-login", methods={"OPTIONS"})

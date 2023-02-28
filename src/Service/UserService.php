@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exception\ForbiddenException;
 use App\Exception\IncorrectEthAddressException;
 use App\Exception\IncorrectSignatureException;
+use App\Exception\UnauthorizedException;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -55,44 +56,6 @@ class UserService
 
     /**
      * @param string $address
-     * @return User
-     */
-    private function getOrAddUserByAddress(string $address): User
-    {
-        $address = strtolower($address);
-        if (!$this->checkEthAddress($address)) {
-            throw new IncorrectEthAddressException();
-        }
-        $user = $this->userRepo->findOneByAddress($address);
-        if (!$user) {
-            $user = (new User())
-                ->setAddress($address)
-                ->setRegisteredAt(new DateTimeImmutable())
-            ;
-            $this->em->persist($user);
-        }
-        return $user;
-    }
-
-    /**
-     * @param string $email
-     * @return User
-     */
-    private function getOrAddUserByEmail(string $email): User
-    {
-        $user = $this->userRepo->findOneByEmail($email);
-        if (!$user) {
-            $user = (new User())
-                ->setEmail($email)
-                ->setRegisteredAt(new DateTimeImmutable())
-            ;
-            $this->em->persist($user);
-        }
-        return $user;
-    }
-
-    /**
-     * @param string $address
      * @return string
      */
     public function getMetamaskLoginMessage(string $address): string
@@ -114,25 +77,25 @@ class UserService
     public function metamaskLogin(string $address, string $signature): array
     {
         $address = strtolower($address);
-        //Получаем строку, которая давалась этому адресу на подпись, из кэша
-        $messageKey = $this->getMessageKey($address);
-        $message = $this->redis->get($messageKey);
-        if (!$message) {
-            throw new ForbiddenException();
-        }
-        //Извлекаем адрес из подписи
-        try {
-            $signerAddress = $this->gethApiService->recoverSignerAddress('0x' . bin2hex($message), $signature);
-        } catch (Exception $e) {
-            throw new ForbiddenException();
-        }
-        //Сверяем полученный адрес с имеющимся
-        if (!$signerAddress || $signerAddress !== $address) {
-            throw new ForbiddenException();
-        }
-        $this->redis->del($messageKey);
+        $this->checkSignature($address, $signature);
         $user = $this->getOrAddUserByAddress($address);
         return [$user, $this->getAuthorizationToken($user)];
+    }
+
+    /**
+     * @param User $user
+     * @param string $address
+     * @param string $signature
+     */
+    public function linkMetamask(User $user, string $address, string $signature): void
+    {
+        $address = strtolower($address);
+        //ToDo: возможно стоит выбрасывать исключение, если у пользователя уже привязан адрес
+        $this->checkSignature($address, $signature);
+        if ($this->userRepo->findOneByAddress($address)) {
+            throw new ForbiddenException('Address already in use');
+        }
+        $user->setAddress($address);
     }
 
     /**
@@ -215,22 +178,22 @@ class UserService
     public function getCurrentUser(?string $authorizationHeader): User
     {
         if (!$authorizationHeader || strpos($authorizationHeader, 'Bearer ') !== 0) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         $token = str_replace('Bearer ', '', $authorizationHeader);
         $secretKey = $this->parameterBag->get('jwtSecretKey');
         try {
             $data = JWT::decode($token, new Key($secretKey, 'HS512'));
         } catch (Exception $e) {
-            throw new ForbiddenException('Token expired');
+            throw new UnauthorizedException('Token expired');
         }
         $now = new DateTimeImmutable();
         if ($data->nbf > $now->getTimestamp() || $data->exp < $now->getTimestamp()) {
-            throw new ForbiddenException('Token expired');
+            throw new UnauthorizedException('Token expired');
         }
         $user = $this->userRepo->findOneById($data->userId);
         if (!$user) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return $user;
     }
@@ -284,5 +247,68 @@ class UserService
     private function getMessageKey(string $address): string
     {
         return $address . 'message';
+    }
+
+    /**
+     * @param string $address
+     * @param string $signature
+     */
+    private function checkSignature(string $address, string $signature): void
+    {
+        //Получаем строку, которая давалась этому адресу на подпись, из кэша
+        $messageKey = $this->getMessageKey($address);
+        $message = $this->redis->get($messageKey);
+        if (!$message) {
+            throw new ForbiddenException();
+        }
+        //Извлекаем адрес из подписи
+        try {
+            $signerAddress = $this->gethApiService->recoverSignerAddress('0x' . bin2hex($message), $signature);
+        } catch (Exception $e) {
+            throw new ForbiddenException();
+        }
+        //Сверяем полученный адрес с имеющимся
+        if (!$signerAddress || $signerAddress !== $address) {
+            throw new ForbiddenException();
+        }
+        $this->redis->del($messageKey);
+    }
+
+    /**
+     * @param string $address
+     * @return User
+     */
+    private function getOrAddUserByAddress(string $address): User
+    {
+        $address = strtolower($address);
+        if (!$this->checkEthAddress($address)) {
+            throw new IncorrectEthAddressException();
+        }
+        $user = $this->userRepo->findOneByAddress($address);
+        if (!$user) {
+            $user = (new User())
+                ->setAddress($address)
+                ->setRegisteredAt(new DateTimeImmutable())
+            ;
+            $this->em->persist($user);
+        }
+        return $user;
+    }
+
+    /**
+     * @param string $email
+     * @return User
+     */
+    private function getOrAddUserByEmail(string $email): User
+    {
+        $user = $this->userRepo->findOneByEmail($email);
+        if (!$user) {
+            $user = (new User())
+                ->setEmail($email)
+                ->setRegisteredAt(new DateTimeImmutable())
+            ;
+            $this->em->persist($user);
+        }
+        return $user;
     }
 }
