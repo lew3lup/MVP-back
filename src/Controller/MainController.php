@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Exception\RequestDataException;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -88,20 +90,27 @@ class MainController extends AbstractController
      * @param ParameterBagInterface $parameterBag
      * @param EntityManagerInterface $em
      * @param UserService $userService
+     * @param LoggerInterface $logger
      * @return RedirectResponse
      */
     public function googleRedirect(
         Request $request,
         ParameterBagInterface $parameterBag,
         EntityManagerInterface $em,
-        UserService $userService
+        UserService $userService,
+        LoggerInterface $logger
     ): RedirectResponse {
-        if ($request->get('code')) {
-            [$user, $token] = $userService->googleLogin($request->get('code'));
-            $em->flush();
+        $url = $parameterBag->get('frontDomain');
+        try {
+            if ($request->get('code')) {
+                [$user, $token] = $userService->googleLogin($request->get('code'));
+                $em->flush();
+                $url .= '?token=' . $token;
+            }
+        } catch (Exception $e) {
+            $logger->warning($e->getMessage(), ['exception' => $e]);
         }
-        //ToDo: передавать в редиректе токен
-        return $this->redirect($parameterBag->get('frontDomain'));
+        return $this->redirect($url);
     }
 
     /**

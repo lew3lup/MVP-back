@@ -97,12 +97,12 @@ class UserService
      */
     public function getMetamaskLoginMessage(string $address): string
     {
-        $user = $this->getOrAddUserByAddress($address);
+        $address = strtolower($address);
         $message = $this->generateRandomString(
             '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             100
         );
-        $this->redis->set($this->getMessageKey($user), $message, 300);
+        $this->redis->set($this->getMessageKey($address), $message, 300);
         return $message;
     }
 
@@ -113,9 +113,9 @@ class UserService
      */
     public function metamaskLogin(string $address, string $signature): array
     {
-        $user = $this->getOrAddUserByAddress($address);
+        $address = strtolower($address);
         //Получаем строку, которая давалась этому адресу на подпись, из кэша
-        $messageKey = $this->getMessageKey($user);
+        $messageKey = $this->getMessageKey($address);
         $message = $this->redis->get($messageKey);
         if (!$message) {
             throw new ForbiddenException();
@@ -127,10 +127,11 @@ class UserService
             throw new ForbiddenException();
         }
         //Сверяем полученный адрес с имеющимся
-        if (!$signerAddress || $signerAddress !== $user->getAddress()) {
+        if (!$signerAddress || $signerAddress !== $address) {
             throw new ForbiddenException();
         }
         $this->redis->del($messageKey);
+        $user = $this->getOrAddUserByAddress($address);
         return [$user, $this->getAuthorizationToken($user)];
     }
 
@@ -277,11 +278,11 @@ class UserService
     }
 
     /**
-     * @param User $user
+     * @param string $address
      * @return string
      */
-    private function getMessageKey(User $user): string
+    private function getMessageKey(string $address): string
     {
-        return 'user' . $user->getId() . 'message';
+        return $address . 'message';
     }
 }
