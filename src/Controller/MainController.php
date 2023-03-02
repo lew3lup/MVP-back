@@ -190,6 +190,29 @@ class MainController extends AbstractController
     }
 
     /**
+     * @Route("get-verification-init-data", name="get-verification-init-data", methods={"GET"})
+     *
+     * @param Request $request
+     * @param ParameterBagInterface $parameterBag
+     * @param UserService $userService
+     * @param FractalService $fractalService
+     * @return JsonResponse
+     */
+    public function getVerificationInitData(
+        Request $request,
+        ParameterBagInterface $parameterBag,
+        UserService $userService,
+        FractalService $fractalService
+    ): JsonResponse {
+        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $state = JWT::encode(['userId' => $user->getId()], $parameterBag->get('jwtSecretKey'), 'HS512');
+        return $this->json([
+            'type' => 'success',
+            'data' => $fractalService->getAuthLink($state)
+        ]);
+    }
+
+    /**
      * @Route("fractal-login", name="fractal-login", methods={"GET"})
      *
      * @param Request $request
@@ -228,7 +251,7 @@ class MainController extends AbstractController
                 //ToDo: наверное нужно где-то сохранять в базе accessToken и refreshToken
                 $accessToken = $accessData['access_token'];
                 $userInfo = $fractalService->getUserInfo($accessToken);
-                //ToDo: обрабатываем и сохраняем $userInfo
+                //ToDo: обрабатываем и сохраняем $userInfo в сущность UserFractal
                 $em->flush();
             } elseif ($error) {
                 throw new Exception($error . ', Error description: ' . $errorDescription);
@@ -249,6 +272,7 @@ class MainController extends AbstractController
      * @Route("service-login", methods={"OPTIONS"})
      * @Route("get-service-login-redirect", methods={"OPTIONS"})
      * @Route("get-blockchain-config", methods={"OPTIONS"})
+     * @Route("get-verification-init-data", methods={"OPTIONS"})
      */
     public function options(): Response
     {
