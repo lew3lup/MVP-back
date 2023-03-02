@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Exception\RequestDataException;
+use App\Repository\UserRepository;
+use App\Service\FractalService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -164,7 +168,7 @@ class MainController extends AbstractController
      * @param ParameterBagInterface $parameterBag
      * @return JsonResponse
      */
-    public function getBlockchainConfig(ParameterBagInterface $parameterBag)
+    public function getBlockchainConfig(ParameterBagInterface $parameterBag): JsonResponse
     {
         $blockchainConfigs = $parameterBag->get('blockchain');
         $data = [];
@@ -183,6 +187,57 @@ class MainController extends AbstractController
             'type' => 'success',
             'data' => $data
         ]);
+    }
+
+    /**
+     * @Route("fractal-login", name="fractal-login", methods={"GET"})
+     *
+     * @param Request $request
+     * @param FractalService $fractalService
+     * @param EntityManagerInterface $em
+     * @param ParameterBagInterface $parameterBag
+     * @param LoggerInterface $logger
+     * @param UserRepository $userRepo
+     * @return RedirectResponse
+     */
+    public function fractalLogin(
+        Request $request,
+        FractalService $fractalService,
+        EntityManagerInterface $em,
+        ParameterBagInterface $parameterBag,
+        LoggerInterface $logger,
+        UserRepository $userRepo
+    ): RedirectResponse {
+        $code = $request->query->get('code');
+        $state = $request->query->get('state');
+        $error = $request->query->get('error');
+        $errorDescription = $request->query->get('error_description');
+        try {
+            if ($code && $state) {
+                $secretKey = $parameterBag->get('jwtSecretKey');
+                $stateData = JWT::decode($state, new Key($secretKey, 'HS512'));
+                if (empty($stateData->userId)) {
+                    throw new Exception('incorrect state');
+                }
+                $user = $userRepo->findOneById($stateData->userId);
+                if (!$user) {
+                    throw new Exception('user with id=' . $stateData->userId . ' not found');
+                }
+                //ToDo: проверка текущего статуса верификации пользователя
+                $accessData = $fractalService->getAccessToken($code);
+                //ToDo: наверное нужно где-то сохранять в базе accessToken и refreshToken
+                $accessToken = $accessData['access_token'];
+                $userInfo = $fractalService->getUserInfo($accessToken);
+                //ToDo: обрабатываем и сохраняем $userInfo
+                $em->flush();
+            } elseif ($error) {
+                throw new Exception($error . ', Error description: ' . $errorDescription);
+            }
+        } catch (Exception $e) {
+            $logger->error('Fractal login error: ' . $e->getMessage());
+        }
+        $redirectUri = $parameterBag->get('frontDomain');
+        return $this->redirect($redirectUri);
     }
 
     /**

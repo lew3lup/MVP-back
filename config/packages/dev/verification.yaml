@@ -1,0 +1,7 @@
+parameters:
+  fractal:
+    appId: ''
+    appSecret: ''
+    frontendDomain: ''
+    authDomain: ''
+    resourceDomain: ''
