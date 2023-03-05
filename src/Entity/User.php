@@ -78,6 +78,11 @@ class User implements JsonSerializable
      * @ORM\OneToMany(targetEntity="UserReferral", mappedBy="referral")
      */
     private $partners;
+    /**
+     * @var UserFractal[]
+     * @ORM\OneToMany(targetEntity="UserFractal", mappedBy="user")
+     */
+    private $userFractals;
 
     /**
      * User constructor.
@@ -89,6 +94,7 @@ class User implements JsonSerializable
         $this->userQuestTasks = new ArrayCollection();
         $this->referrals = new ArrayCollection();
         $this->partners = new ArrayCollection();
+        $this->userFractals = new ArrayCollection();
     }
 
     /**
@@ -217,6 +223,16 @@ class User implements JsonSerializable
     public function getPartners(): Collection
     {
         return $this->partners;
+    }
+
+    /**
+     * @return UserFractal|null
+     */
+    public function getUserFractal(): ?UserFractal
+    {
+        return count($this->userFractals) > 0
+            ? $this->userFractals->toArray()[0]
+            : null;
     }
 
     /**
