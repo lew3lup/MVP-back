@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\UserFractal;
+use App\Exception\ForbiddenException;
 use App\Exception\RequestDataException;
 use App\Repository\UserRepository;
 use App\Service\FractalService;
 use App\Service\UserService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Firebase\JWT\JWT;
@@ -205,6 +208,9 @@ class MainController extends AbstractController
         FractalService $fractalService
     ): JsonResponse {
         $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        if ($user->getUserFractal()) {
+            throw new ForbiddenException();
+        }
         $state = JWT::encode(['userId' => $user->getId()], $parameterBag->get('jwtSecretKey'), 'HS512');
         return $this->json([
             'type' => 'success',
@@ -246,12 +252,20 @@ class MainController extends AbstractController
                 if (!$user) {
                     throw new Exception('user with id=' . $stateData->userId . ' not found');
                 }
-                //ToDo: проверка текущего статуса верификации пользователя
+                if ($user->getUserFractal()) {
+                    throw new Exception('user with id=' . $stateData->userId . ' already verified');
+                }
                 $accessData = $fractalService->getAccessToken($code);
+                $userFractal = (new UserFractal())
+                    ->setUser($user)
+                    ->setCreatedAt((new DateTimeImmutable())->setTimestamp($accessData['created_at']))
+                ;
                 //ToDo: наверное нужно где-то сохранять в базе accessToken и refreshToken
                 $accessToken = $accessData['access_token'];
                 $userInfo = $fractalService->getUserInfo($accessToken);
+                die(print_r($userInfo));
                 //ToDo: обрабатываем и сохраняем $userInfo в сущность UserFractal
+                $em->persist($userFractal);
                 $em->flush();
             } elseif ($error) {
                 throw new Exception($error . ', Error description: ' . $errorDescription);

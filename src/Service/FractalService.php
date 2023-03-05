@@ -27,7 +27,7 @@ class FractalService
     public function __construct(ParameterBagInterface $parameterBag)
     {
         $fractalConfig = $parameterBag->get('fractal');
-        $this->appId = $fractalConfig['appToken'];
+        $this->appId = $fractalConfig['appId'];
         $this->appSecret = $fractalConfig['appSecret'];
         $this->frontendDomain = $fractalConfig['frontendDomain'];
         $this->authDomain = $fractalConfig['authDomain'];
@@ -45,7 +45,7 @@ class FractalService
             'client_id'     => $this->appId,
             'redirect_uri'  => $this->redirectUri,
             'response_type' => 'code',
-            'scope'         => '',//ToDo
+            'scope'         => 'verification.uniqueness:read',
             'state'         => $state,
         ];
         return 'https://' . $this->frontendDomain . '/authorize?' . http_build_query($data);
@@ -106,7 +106,7 @@ class FractalService
             throw new FractalException();
         }
         curl_close($ch);
-        $result = json_decode($result);
+        $result = json_decode($result, true);
         return $result;
     }
 

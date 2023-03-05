@@ -226,11 +226,13 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return Collection|UserFractal[]
+     * @return UserFractal|null
      */
-    public function getUserFractals(): Collection
+    public function getUserFractal(): ?UserFractal
     {
-        return $this->userFractals;
+        return count($this->userFractals) > 0
+            ? $this->userFractals->toArray()[0]
+            : null;
     }
 
     /**

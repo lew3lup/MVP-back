@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,6 +29,11 @@ class UserFractal
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="created_at")
+     */
+    private $createdAt;
 
     /**
      * @return int
@@ -52,6 +58,24 @@ class UserFractal
     public function setUser(User $user): UserFractal
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $createdAt
+     * @return UserFractal
+     */
+    public function setCreatedAt(DateTimeImmutable $createdAt): UserFractal
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 }
