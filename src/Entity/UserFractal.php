@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,10 +29,20 @@ class UserFractal
      */
     private $user;
     /**
-     * @var DateTimeImmutable
-     * @ORM\Column(type="datetime_immutable", name="created_at")
+     * @var array
+     * @ORM\Column(type="json", name="access_data")
      */
-    private $createdAt;
+    private $accessData;
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     */
+    private $uid;
+    /**
+     * @var array
+     * @ORM\Column(type="json", name="verification_cases")
+     */
+    private $verificationCases;
 
     /**
      * @return int
@@ -62,20 +71,56 @@ class UserFractal
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return array
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getAccessData(): array
     {
-        return $this->createdAt;
+        return $this->accessData;
     }
 
     /**
-     * @param DateTimeImmutable $createdAt
+     * @param array $accessData
      * @return UserFractal
      */
-    public function setCreatedAt(DateTimeImmutable $createdAt): UserFractal
+    public function setAccessData(array $accessData): UserFractal
     {
-        $this->createdAt = $createdAt;
+        $this->accessData = $accessData;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUid(): string
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @param string $uid
+     * @return UserFractal
+     */
+    public function setUid(string $uid): UserFractal
+    {
+        $this->uid = $uid;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getVerificationCases(): array
+    {
+        return $this->verificationCases;
+    }
+
+    /**
+     * @param array $verificationCases
+     * @return UserFractal
+     */
+    public function setVerificationCases(array $verificationCases): UserFractal
+    {
+        $this->verificationCases = $verificationCases;
         return $this;
     }
 }

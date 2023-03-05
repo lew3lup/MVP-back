@@ -8,7 +8,6 @@ use App\Exception\RequestDataException;
 use App\Repository\UserRepository;
 use App\Service\FractalService;
 use App\Service\UserService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Firebase\JWT\JWT;
@@ -107,6 +106,7 @@ class MainController extends AbstractController
         UserService $userService,
         LoggerInterface $logger
     ): RedirectResponse {
+        //ToDo: поменять адрес редиректа, когда он будет известен
         $url = $parameterBag->get('frontDomain');
         try {
             if ($request->get('code')) {
@@ -256,15 +256,14 @@ class MainController extends AbstractController
                     throw new Exception('user with id=' . $stateData->userId . ' already verified');
                 }
                 $accessData = $fractalService->getAccessToken($code);
+                $userInfo = $fractalService->getUserInfo($accessData['access_token']);
+                //ToDo: проверка статуса верификации
                 $userFractal = (new UserFractal())
                     ->setUser($user)
-                    ->setCreatedAt((new DateTimeImmutable())->setTimestamp($accessData['created_at']))
+                    ->setAccessData($accessData)
+                    ->setUid($userInfo['uid'])
+                    ->setVerificationCases($userInfo['verification_cases'])
                 ;
-                //ToDo: наверное нужно где-то сохранять в базе accessToken и refreshToken
-                $accessToken = $accessData['access_token'];
-                $userInfo = $fractalService->getUserInfo($accessToken);
-                die(print_r($userInfo));
-                //ToDo: обрабатываем и сохраняем $userInfo в сущность UserFractal
                 $em->persist($userFractal);
                 $em->flush();
             } elseif ($error) {
@@ -273,6 +272,7 @@ class MainController extends AbstractController
         } catch (Exception $e) {
             $logger->error('Fractal login error: ' . $e->getMessage());
         }
+        //ToDo: поменять адрес редиректа, когда он будет известен
         $redirectUri = $parameterBag->get('frontDomain');
         return $this->redirect($redirectUri);
     }
