@@ -26,6 +26,7 @@ final class Version20230305075215 extends AbstractMigration
             access_data json not null,
             uid text not null,
             verification_cases json not null,
+            status smallint not null,
             PRIMARY KEY (id),
             FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
         )');

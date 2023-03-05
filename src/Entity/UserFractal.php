@@ -15,6 +15,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserFractal
 {
+    public const STATUS_PENDING = 0;
+    public const STATUS_APPROVED = 1;
+    public const STATUS_REJECTED = -1;
+
+    public const STATUSES = [
+        'pending' => self::STATUS_PENDING,
+        'approved' => self::STATUS_APPROVED,
+        'rejected' => self::STATUS_REJECTED,
+    ];
+
     /**
      * @var int
      * @ORM\Column(type="integer")
@@ -43,6 +53,11 @@ class UserFractal
      * @ORM\Column(type="json", name="verification_cases")
      */
     private $verificationCases;
+    /**
+     * @var int
+     * @ORM\Column(type="smallint")
+     */
+    private $status;
 
     /**
      * @return int
@@ -121,6 +136,24 @@ class UserFractal
     public function setVerificationCases(array $verificationCases): UserFractal
     {
         $this->verificationCases = $verificationCases;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     * @return UserFractal
+     */
+    public function setStatus(int $status): UserFractal
+    {
+        $this->status = $status;
         return $this;
     }
 }

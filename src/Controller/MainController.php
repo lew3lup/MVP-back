@@ -257,12 +257,12 @@ class MainController extends AbstractController
                 }
                 $accessData = $fractalService->getAccessToken($code);
                 $userInfo = $fractalService->getUserInfo($accessData['access_token']);
-                //ToDo: проверка статуса верификации
                 $userFractal = (new UserFractal())
                     ->setUser($user)
                     ->setAccessData($accessData)
                     ->setUid($userInfo['uid'])
                     ->setVerificationCases($userInfo['verification_cases'])
+                    ->setStatus(UserFractal::STATUSES[$userInfo['verification_cases'][0]['credential']])
                 ;
                 $em->persist($userFractal);
                 $em->flush();
