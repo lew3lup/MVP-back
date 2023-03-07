@@ -2,10 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\UserFractal;
+use App\Exception\ForbiddenException;
 use App\Exception\RequestDataException;
+use App\Repository\UserRepository;
+use App\Service\FractalService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -100,6 +106,7 @@ class MainController extends AbstractController
         UserService $userService,
         LoggerInterface $logger
     ): RedirectResponse {
+        //ToDo: поменять адрес редиректа, когда он будет известен
         $url = $parameterBag->get('frontDomain');
         try {
             if ($request->get('code')) {
@@ -164,7 +171,7 @@ class MainController extends AbstractController
      * @param ParameterBagInterface $parameterBag
      * @return JsonResponse
      */
-    public function getBlockchainConfig(ParameterBagInterface $parameterBag)
+    public function getBlockchainConfig(ParameterBagInterface $parameterBag): JsonResponse
     {
         $blockchainConfigs = $parameterBag->get('blockchain');
         $data = [];
@@ -186,6 +193,91 @@ class MainController extends AbstractController
     }
 
     /**
+     * @Route("get-verification-init-data", name="get-verification-init-data", methods={"GET"})
+     *
+     * @param Request $request
+     * @param ParameterBagInterface $parameterBag
+     * @param UserService $userService
+     * @param FractalService $fractalService
+     * @return JsonResponse
+     */
+    public function getVerificationInitData(
+        Request $request,
+        ParameterBagInterface $parameterBag,
+        UserService $userService,
+        FractalService $fractalService
+    ): JsonResponse {
+        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        if ($user->getUserFractal()) {
+            throw new ForbiddenException();
+        }
+        $state = JWT::encode(['userId' => $user->getId()], $parameterBag->get('jwtSecretKey'), 'HS512');
+        return $this->json([
+            'type' => 'success',
+            'data' => $fractalService->getAuthLink($state)
+        ]);
+    }
+
+    /**
+     * @Route("fractal-login", name="fractal-login", methods={"GET"})
+     *
+     * @param Request $request
+     * @param FractalService $fractalService
+     * @param EntityManagerInterface $em
+     * @param ParameterBagInterface $parameterBag
+     * @param LoggerInterface $logger
+     * @param UserRepository $userRepo
+     * @return RedirectResponse
+     */
+    public function fractalLogin(
+        Request $request,
+        FractalService $fractalService,
+        EntityManagerInterface $em,
+        ParameterBagInterface $parameterBag,
+        LoggerInterface $logger,
+        UserRepository $userRepo
+    ): RedirectResponse {
+        $code = $request->query->get('code');
+        $state = $request->query->get('state');
+        $error = $request->query->get('error');
+        $errorDescription = $request->query->get('error_description');
+        try {
+            if ($code && $state) {
+                $secretKey = $parameterBag->get('jwtSecretKey');
+                $stateData = JWT::decode($state, new Key($secretKey, 'HS512'));
+                if (empty($stateData->userId)) {
+                    throw new Exception('incorrect state');
+                }
+                $user = $userRepo->findOneById($stateData->userId);
+                if (!$user) {
+                    throw new Exception('user with id=' . $stateData->userId . ' not found');
+                }
+                if ($user->getUserFractal()) {
+                    throw new Exception('user with id=' . $stateData->userId . ' already verified');
+                }
+                $accessData = $fractalService->getAccessToken($code);
+                $userInfo = $fractalService->getUserInfo($accessData['access_token']);
+                $userFractal = (new UserFractal())
+                    ->setUser($user)
+                    ->setAccessData($accessData)
+                    ->setUid($userInfo['uid'])
+                    ->setVerificationCases($userInfo['verification_cases'])
+                    ->setStatus(UserFractal::STATUSES[$userInfo['verification_cases'][0]['credential']])
+                ;
+                $em->persist($userFractal);
+                $em->flush();
+            } elseif ($error) {
+                throw new Exception($error . ', Error description: ' . $errorDescription);
+            }
+        } catch (Exception $e) {
+            $logger->error('Fractal login error: ' . $e->getMessage());
+        }
+        //ToDo: поменять адрес редиректа, когда он будет известен
+        $redirectUri = $parameterBag->get('frontDomain');
+        return $this->redirect($redirectUri);
+    }
+
+    /**
      * @Route("get-metamask-login-message", methods={"OPTIONS"})
      * @Route("metamask-login", methods={"OPTIONS"})
      * @Route("link-metamask", methods={"OPTIONS"})
@@ -194,6 +286,7 @@ class MainController extends AbstractController
      * @Route("service-login", methods={"OPTIONS"})
      * @Route("get-service-login-redirect", methods={"OPTIONS"})
      * @Route("get-blockchain-config", methods={"OPTIONS"})
+     * @Route("get-verification-init-data", methods={"OPTIONS"})
      */
     public function options(): Response
     {

@@ -1,0 +1,7 @@
+parameters:
+  fractal:
+    appId: '%env(FRACTAL_APP_ID)%'
+    appSecret: '%env(FRACTAL_APP_SECRET)%'
+    frontendDomain: 'app.fractal.id'
+    authDomain: 'auth.fractal.id'
+    resourceDomain: 'resource.fractal.id'

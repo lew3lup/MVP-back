@@ -1,0 +1,7 @@
+parameters:
+  fractal:
+    appId: 'aq7BagW8ZlzkXlS5E29YeM-X_KR1lw9K-oWoJDpEtT8'
+    appSecret: 'czYZsHl0F_MubsAUmq838SOCZy2fTt1s7OJmMVlL3O0'
+    frontendDomain: 'app.next.fractal.id'
+    authDomain: 'auth.next.fractal.id'
+    resourceDomain: 'resource.next.fractal.id'
