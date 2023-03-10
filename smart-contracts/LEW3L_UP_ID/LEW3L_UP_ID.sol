@@ -124,7 +124,7 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
     }
 
     function tokenIdOf(address from) external view returns (uint256) {
-        return _tokenMap.get(from, "The wallet has not attested any SBT");
+        return _tokenMap.get(from, "The wallet has not attested any token");
     }
 
     function ownerOf(uint256 tokenId) external view returns (address) {
