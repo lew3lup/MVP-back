@@ -41,6 +41,18 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
         _attester = attester;
     }
 
+    function setBaseTokenURI(string calldata uri) external onlyOwner {
+        _baseTokenURI = uri;
+    }
+
+    function setSigner(address signer) external onlyOwner {
+        _signer = signer;
+    }
+
+    function setAttester(address attester) external onlyOwner {
+        _attester = attester;
+    }
+
     function attest(address to) external returns (uint256) {
         require(_msgSender() == _attester, "Forbidden");
         require(to != address(0), "Address is empty");
@@ -104,18 +116,6 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
         emit Transfer(address(0), to, tokenId);
 
         return tokenId;
-    }
-
-    function setBaseTokenURI(string calldata uri) external onlyOwner {
-        _baseTokenURI = uri;
-    }
-
-    function setSigner(address signer) external onlyOwner {
-        _signer = signer;
-    }
-
-    function setAttester(address attester) external onlyOwner {
-        _attester = attester;
     }
 
     function balanceOf(address owner) external view returns (uint256) {
