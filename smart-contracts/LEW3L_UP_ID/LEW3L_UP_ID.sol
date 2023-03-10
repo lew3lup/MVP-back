@@ -16,27 +16,30 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
     using EnumerableMap for EnumerableMap.AddressToUintMap;
     using EnumerableMap for EnumerableMap.UintToAddressMap;
 
-    // Mapping from token ID to owner address
     EnumerableMap.UintToAddressMap private _ownerMap;
     EnumerableMap.AddressToUintMap private _tokenMap;
 
-    // Token Id
     Counters.Counter private _tokenId;
 
-    // Token name
     string public name;
-
-    // Token symbol
     string public symbol;
-
-    // Token URI
     string private _baseTokenURI;
-
-    //ToDo: переназначение этих параметров
     address private _signer;
     address private _attester;
 
-    //ToDo: конструктор
+    constructor(
+        string memory tokenName,
+        string memory tokenSymbol,
+        string memory baseTokenUri,
+        address signer,
+        address attester
+    ) {
+        name = tokenName;
+        symbol = tokenSymbol;
+        _baseTokenURI = baseTokenUri;
+        _signer = signer;
+        _attester = attester;
+    }
 
     function attest(address to) external returns (uint256) {
         require(_msgSender() == _attester, "Forbidden");
@@ -103,11 +106,16 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
         return tokenId;
     }
 
-    /**
-     * @dev Update _baseTokenURI
-     */
-    function setBaseTokenURI(string calldata uri) public onlyOwner {
+    function setBaseTokenURI(string calldata uri) external onlyOwner {
         _baseTokenURI = uri;
+    }
+
+    function setSigner(address signer) external onlyOwner {
+        _signer = signer;
+    }
+
+    function setAttester(address attester) external onlyOwner {
+        _attester = attester;
     }
 
     function balanceOf(address owner) external view returns (uint256) {
@@ -127,18 +135,10 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
         return _tokenMap.length();
     }
 
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
     function tokenURI(uint256 tokenId) external view returns (string memory) {
-        return bytes(_baseTokenURI).length > 0
-        ? string(abi.encodePacked(_baseTokenURI, tokenId.toString()))
-        : "";
+        return bytes(_baseTokenURI).length > 0 ? string(abi.encodePacked(_baseTokenURI, tokenId.toString())) : "";
     }
 
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC721).interfaceId || interfaceId == type(IERC721Metadata).interfaceId || super.supportsInterface(interfaceId);
     }
