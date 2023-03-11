@@ -29,12 +29,19 @@ class BabtToken
      */
     private $user;
     /**
-     * ID паспорта в рамках контракта
+     * ID токена в рамках контракта
      *
      * @var int
      * @ORM\Column(type="integer", name="id_in_contract")
      */
     private $idInContract;
+    /**
+     * ETH-адрес владельца
+     *
+     * @var string
+     * @ORM\Column(type="string", length=42, name="owner_address")
+     */
+    private $ownerAddress;
     /**
      * @var Event
      * @ORM\ManyToOne(targetEntity="Event")
@@ -83,6 +90,24 @@ class BabtToken
     public function setIdInContract(int $idInContract): BabtToken
     {
         $this->idInContract = $idInContract;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerAddress(): string
+    {
+        return $this->ownerAddress;
+    }
+
+    /**
+     * @param string $ownerAddress
+     * @return BabtToken
+     */
+    public function setOwnerAddress(string $ownerAddress): BabtToken
+    {
+        $this->ownerAddress = $ownerAddress;
         return $this;
     }
 

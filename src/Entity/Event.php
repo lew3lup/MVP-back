@@ -16,15 +16,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Event
 {
-    //ToDo: будут другие события
-    public const NAME_TRANSFER          = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-    public const NAME_VERIFIER_ADD      = '0x551d98192f710ed8b346e5257120374e4f7cb753f6ef5d61495505b5b6f57c6f';
-    public const NAME_VERIFIER_UPDATE   = '0x780f016699c7ef9cc5323b051651d5e95586650ef612d49d9e56f0fb71ca8d58';
-    public const NAME_PASSPORT_MINT     = '0x38cd67f29db65332fe33a24649114b9d1141d73e7ff2ef991ffa34447472f36b';
-    public const NAME_PASSPORT_UPDATE   = '0xa1159e8ddd7f4a9d61b3cf7e4fd614f21df9c3fdd7164e441b911a84ca27c1d0';
-    public const NAME_PASSPORT_BURN     = '0x15609fd2aeb513a9f338e0adabb11344f783391848339b91757a3623606290f6';
-    public const NAME_NICKNAME_UPDATE   = '0xc5b9ad06a17bf3ae4fccd0a74b6229ff6746b4fb7e78d8d0e0b99dfb183363b3';
-    public const NAME_BABT_ATTEST       = '0xe9274a84b19e9428826de6bae8c48329354f8f0e73f771b97cae2d9dccd45a27';
+    public const NAME_ATTEST    = '0xe9274a84b19e9428826de6bae8c48329354f8f0e73f771b97cae2d9dccd45a27';
+    public const NAME_REVOKE    = '0xec9ab91322523c899ede7830ec9bfc992b5981cdcc27b91162fb23de5791117b';
+    public const NAME_BURN      = '0xcc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5';
 
     /**
      * @var int

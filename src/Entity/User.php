@@ -49,6 +49,11 @@ class User implements JsonSerializable
      */
     private $registeredAt;
     /**
+     * @var IdNft[]
+     * @ORM\OneToMany(targetEntity="IdNft", mappedBy="user")
+     */
+    private $idNfts;
+    /**
      * @var BabtToken[]
      * @ORM\OneToMany(targetEntity="BabtToken", mappedBy="user")
      */
@@ -88,6 +93,7 @@ class User implements JsonSerializable
      * User constructor.
      */
     public function __construct() {
+        $this->idNfts = new ArrayCollection();
         $this->babtTokens = new ArrayCollection();
         $this->userAchievements = new ArrayCollection();
         $this->userQuests = new ArrayCollection();
@@ -175,6 +181,14 @@ class User implements JsonSerializable
     {
         $this->registeredAt = $registeredAt;
         return $this;
+    }
+
+    /**
+     * @return Collection|IdNft[]
+     */
+    public function getIdNfts(): Collection
+    {
+        return $this->idNfts;
     }
 
     /**

@@ -33,9 +33,10 @@ class EventRepository extends EntityRepository
     public function findUnattachedBabt(): array
     {
         $conn = $this->getEntityManager()->getConnection();
+        //ToDo: добавить фильтр по контракту BABT!!!
         $sql = 'SELECT u.id as user_id, e.id as event_id FROM users u INNER JOIN events e ON (substring(u.address from 3) = substring(e.topic_1 from 27) AND e.name = :name) WHERE e.id NOT IN (SELECT event_id FROM babt_tokens)';
         $stmt = $conn->prepare($sql);
-        $result = $stmt->executeQuery(['name' => Event::NAME_BABT_ATTEST]);
+        $result = $stmt->executeQuery(['name' => Event::NAME_ATTEST]);
         return $result->fetchAllAssociative();
     }
 }

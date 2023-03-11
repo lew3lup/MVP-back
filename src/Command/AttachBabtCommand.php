@@ -57,6 +57,7 @@ class AttachBabtCommand extends Command
             foreach ($unattachedBabt as $babt) {
                 $user = $this->userRepo->findOneBy(['id' => $babt['user_id']]);
                 $event = $this->eventRepo->findOneBy(['id' => $babt['event_id']]);
+                //ToDo: сохранение адреса владельца!
                 $babtToken = (new BabtToken())
                     ->setUser($user)
                     ->setEvent($event)
