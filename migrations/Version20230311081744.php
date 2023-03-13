@@ -19,28 +19,45 @@ final class Version20230311081744 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        //IdNft
-        $this->addSql('ALTER TABLE id_nfts
-            ADD COLUMN user_id integer not null,
-            ADD COLUMN id_in_contract integer not null,
-            ADD COLUMN owner_address char (42) not null,
-            ADD COLUMN event_id integer not null,
-            ADD FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
-            ADD FOREIGN KEY (event_id) REFERENCES events ON DELETE CASCADE
-        ');
+        $this->addSql('DROP TABLE id_nfts');
+        $this->addSql('DROP TABLE babt_tokens');
 
-        //BabtToken
-        $this->addSql('ALTER TABLE babt_tokens ADD COLUMN owner_address char (42) not null');
+        //SbtToken
+        $this->addSql('CREATE TABLE sbt_tokens (
+            id serial not null,
+            user_id integer not null,
+            chain_id integer not null,
+            contract char (42) not null,
+            id_in_contract integer not null,
+            owner_address char (42) not null,
+            attest_event_id integer not null,
+            revoke_event_id integer null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+            FOREIGN KEY (attest_event_id) REFERENCES events ON DELETE RESTRICT,
+            FOREIGN KEY (revoke_event_id) REFERENCES events ON DELETE RESTRICT
+        )');
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE id_nfts
-            DROP COLUMN user_id,
-            DROP COLUMN id_in_contract,
-            DROP COLUMN owner_address,
-            DROP COLUMN event_id
-        ');
-        $this->addSql('ALTER TABLE babt_tokens DROP COLUMN owner_address');
+        $this->addSql('DROP TABLE sbt_tokens');
+
+        //BabtToken
+        $this->addSql('CREATE TABLE babt_tokens (
+            id serial not null,
+            user_id integer not null,
+            id_in_contract integer not null,
+            event_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+            FOREIGN KEY (event_id) REFERENCES events ON DELETE CASCADE
+        )');
+
+        //IdNft
+        $this->addSql('CREATE TABLE id_nfts (
+            id serial not null,
+            PRIMARY KEY (id)
+        )');
     }
 }

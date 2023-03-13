@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\BabtToken;
+use App\Entity\SbtToken;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AttachBabtCommand extends Command
+class ManageSbtCommand extends Command
 {
     /** @var EntityManagerInterface */
     protected $em;
@@ -21,7 +21,7 @@ class AttachBabtCommand extends Command
     protected $userRepo;
 
     /**
-     * AttachBabtCommand constructor.
+     * ManageSbtCommand constructor.
      * @param EntityManagerInterface $em
      * @param EventRepository $eventRepo
      * @param UserRepository $userRepo
@@ -41,7 +41,7 @@ class AttachBabtCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('attach-babt')->setDescription('Attach BABT tokens to users');
+        $this->setName('manage-sbt')->setDescription('Manage SBT-tokens');
     }
 
     /**
@@ -52,17 +52,20 @@ class AttachBabtCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $unattachedBabt = $this->eventRepo->findUnattachedBabt();
-        if ($unattachedBabt) {
-            foreach ($unattachedBabt as $babt) {
-                $user = $this->userRepo->findOneBy(['id' => $babt['user_id']]);
-                $event = $this->eventRepo->findOneBy(['id' => $babt['event_id']]);
+        $unattachedSbt = $this->eventRepo->findUnattachedSbt();
+        if ($unattachedSbt) {
+            foreach ($unattachedSbt as $sbt) {
+                $user = $this->userRepo->findOneBy(['id' => $sbt['user_id']]);
+                $event = $this->eventRepo->findOneBy(['id' => $sbt['event_id']]);
                 //ToDo: сохранение адреса владельца!
-                $babtToken = (new BabtToken())
+                $sbtToken = (new SbtToken())
                     ->setUser($user)
-                    ->setEvent($event)
+                    ->setAttestEvent($event)
+                    ->setChainId($event->getChainId())
+                    ->setContract($event->getContract())
+                    //->setOwnerAddress()
                     ->setIdInContract(hexdec($event->getTopic2()));
-                $this->em->persist($babtToken);
+                $this->em->persist($sbtToken);
             }
             $this->em->flush();
         }

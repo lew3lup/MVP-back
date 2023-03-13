@@ -58,21 +58,9 @@ class EventService
                 }
             }
             if (!$alreadyParsed) {
-                $this->saveEvent($event);
+                $this->em->persist($event);
+                $this->em->flush();
             }
         }
-    }
-
-    /**
-     * @param Event $event
-     * @throws Exception
-     */
-    private function saveEvent(Event $event): void
-    {
-        switch ($event->getName()) {
-            //ToDo
-        }
-        $this->em->persist($event);
-        $this->em->flush();
     }
 }

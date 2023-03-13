@@ -16,9 +16,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Event
 {
-    public const NAME_ATTEST    = '0xe9274a84b19e9428826de6bae8c48329354f8f0e73f771b97cae2d9dccd45a27';
-    public const NAME_REVOKE    = '0xec9ab91322523c899ede7830ec9bfc992b5981cdcc27b91162fb23de5791117b';
-    public const NAME_BURN      = '0xcc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5';
+    public const NAME_SBT_ATTEST    = '0xe9274a84b19e9428826de6bae8c48329354f8f0e73f771b97cae2d9dccd45a27';
+    public const NAME_SBT_REVOKE    = '0xec9ab91322523c899ede7830ec9bfc992b5981cdcc27b91162fb23de5791117b';
+    public const NAME_SBT_BURN      = '0xcc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5';
 
     /**
      * @var int
