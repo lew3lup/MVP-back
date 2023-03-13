@@ -41,4 +41,22 @@ class EventRepository extends EntityRepository
         $result = $stmt->executeQuery(['name' => Event::NAME_SBT_ATTEST]);
         return $result->fetchAllAssociative();
     }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function findSbtToRevoke(): array
+    {
+        $sql = '
+            SELECT s.id as sbt_id, e.id as event_id FROM sbt_tokens s
+            INNER JOIN events e ON (
+                substring(s.owner_address from 3) = substring(e.topic_1 from 27)
+                AND e.name IN (:names) AND s.revoke_event_id IS NULL
+            )
+        ';
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $result = $stmt->executeQuery(['names' => [Event::NAME_SBT_REVOKE, Event::NAME_SBT_BURN]]);
+        return $result->fetchAllAssociative();
+    }
 }

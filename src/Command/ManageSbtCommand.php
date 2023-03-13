@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\SbtToken;
 use App\Repository\EventRepository;
+use App\Repository\SbtTokenRepository;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,23 +20,28 @@ class ManageSbtCommand extends Command
     protected $eventRepo;
     /** @var UserRepository */
     protected $userRepo;
+    /** @var SbtTokenRepository */
+    protected $sbtRepo;
 
     /**
      * ManageSbtCommand constructor.
      * @param EntityManagerInterface $em
      * @param EventRepository $eventRepo
      * @param UserRepository $userRepo
+     * @param SbtTokenRepository $sbtRepo
      * @param string|null $name
      */
     public function __construct(
         EntityManagerInterface $em,
         EventRepository $eventRepo,
         UserRepository $userRepo,
+        SbtTokenRepository $sbtRepo,
         string $name = null
     ) {
         $this->em = $em;
         $this->eventRepo = $eventRepo;
         $this->userRepo = $userRepo;
+        $this->sbtRepo = $sbtRepo;
         parent::__construct($name);
     }
 
@@ -66,6 +72,15 @@ class ManageSbtCommand extends Command
                     //->setOwnerAddress()
                     ->setIdInContract(hexdec($event->getTopic2()));
                 $this->em->persist($sbtToken);
+            }
+            $this->em->flush();
+        }
+        $sbtToRevoke = $this->eventRepo->findSbtToRevoke();
+        if ($sbtToRevoke) {
+            foreach ($sbtToRevoke as $sbt) {
+                $sbtToken = $this->sbtRepo->findOneBy(['id' => $sbt['sbt_id']]);
+                $event = $this->eventRepo->findOneBy(['id' => $sbt['event_id']]);
+                $sbtToken->setRevokeEvent($event);
             }
             $this->em->flush();
         }
