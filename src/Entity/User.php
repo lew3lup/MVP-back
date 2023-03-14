@@ -49,10 +49,10 @@ class User implements JsonSerializable
      */
     private $registeredAt;
     /**
-     * @var BabtToken[]
-     * @ORM\OneToMany(targetEntity="BabtToken", mappedBy="user")
+     * @var SbtToken[]
+     * @ORM\OneToMany(targetEntity="SbtToken", mappedBy="user")
      */
-    private $babtTokens;
+    private $sbtTokens;
     /**
      * @var UserAchievement[]
      * @ORM\OneToMany(targetEntity="UserAchievement", mappedBy="user")
@@ -88,7 +88,7 @@ class User implements JsonSerializable
      * User constructor.
      */
     public function __construct() {
-        $this->babtTokens = new ArrayCollection();
+        $this->sbtTokens = new ArrayCollection();
         $this->userAchievements = new ArrayCollection();
         $this->userQuests = new ArrayCollection();
         $this->userQuestTasks = new ArrayCollection();
@@ -178,11 +178,11 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return Collection|BabtToken[]
+     * @return Collection|SbtToken[]
      */
-    public function getBabtTokens(): Collection
+    public function getSbtTokens(): Collection
     {
-        return $this->babtTokens;
+        return $this->sbtTokens;
     }
 
     /**

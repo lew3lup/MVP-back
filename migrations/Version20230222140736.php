@@ -23,12 +23,12 @@ final class Version20230222140736 extends AbstractMigration
         $this->addSql('CREATE TABLE events (
             id serial not null,
             chain_id integer not null,
-            contract varchar (42) not null,
-            transaction_hash varchar (66) not null,
-            name varchar (66) not null,
-            topic_1 varchar (66) null,
-            topic_2 varchar (66) null,
-            topic_3 varchar (66) null,
+            contract char (42) not null,
+            transaction_hash char (66) not null,
+            name char (66) not null,
+            topic_1 char (66) null,
+            topic_2 char (66) null,
+            topic_3 char (66) null,
             data text null,
             block_number integer not null,
             timestamp timestamp(0) not null,
@@ -43,7 +43,7 @@ final class Version20230222140736 extends AbstractMigration
         //User
         $this->addSql('CREATE TABLE users (
             id serial not null,
-            address varchar (42) null,
+            address char (42) null,
             email text null,
             name text null,
             registered_at timestamp(0) default now() not null,
@@ -124,7 +124,7 @@ final class Version20230222140736 extends AbstractMigration
         $this->addSql('CREATE TABLE last_parsed_blocks (
             id serial not null,
             chain_id integer not null,
-            contract varchar (42) not null,
+            contract char (42) not null,
             block integer,
             updated_at timestamp(0) default now() not null,
             PRIMARY KEY (id),

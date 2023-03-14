@@ -16,11 +16,11 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\Achievement'
-  App\Repository\BabtTokenRepository:
+  App\Repository\SbtTokenRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
     arguments:
-      - 'App\Entity\BabtToken'
+      - 'App\Entity\SbtToken'
   App\Repository\EventRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
@@ -41,11 +41,6 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\Game'
-  App\Repository\IdNftRepository:
-    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
-    lazy: true
-    arguments:
-      - 'App\Entity\IdNft'
   App\Repository\LastParsedBlockRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true

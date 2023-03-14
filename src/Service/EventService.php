@@ -44,7 +44,7 @@ class EventService
         foreach ($events as $event) {
             $transactions[] = $event->getTransactionHash();
         }
-        //Проверяем события, не были ли они уже были добавлены в базу ранее
+        //Проверяем события, не были ли они уже добавлены в базу ранее
         $alreadyParsedEvents = $this->eventRepo->findByChainAndTransactions($chainId, $transactions);
         foreach ($events as $event) {
             $alreadyParsed = false;
@@ -58,21 +58,9 @@ class EventService
                 }
             }
             if (!$alreadyParsed) {
-                $this->saveEvent($event);
+                $this->em->persist($event);
+                $this->em->flush();
             }
         }
-    }
-
-    /**
-     * @param Event $event
-     * @throws Exception
-     */
-    private function saveEvent(Event $event): void
-    {
-        switch ($event->getName()) {
-            //ToDo
-        }
-        $this->em->persist($event);
-        $this->em->flush();
     }
 }
