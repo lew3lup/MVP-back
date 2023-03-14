@@ -1,0 +1,9 @@
+parameters:
+  babt: {
+    56: {
+      parser: "EtherscanEventParser",
+      apiDomain: "api.bscscan.com",
+      apiKey: "FY6WSKQHTU35SVCB46KV48HDMSVJ53BDCV",
+      contractAddress: "0x2b09d47d550061f995a3b5c6f0fd58005215d7c8"
+    }
+  }

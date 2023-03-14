@@ -3,7 +3,7 @@ parameters:
     5: {
       parser: "EtherscanEventParser",
       apiDomain: "api-goerli.etherscan.io",
-      apiKey: "ZJMXDUG8ZK5NY139B1EYFTZ5R9WFZ19X89",
+      apiKey: "1YHP4X7F3CG2WKMZ3MSMGTCFXITYWVV6H5",
       rpcUrl: "",
       explorerUrl: "https://goerli.etherscan.io",
       currencySymbol: "ETH",
