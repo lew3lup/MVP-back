@@ -63,13 +63,13 @@ class ManageSbtCommand extends Command
             foreach ($unattachedSbt as $sbt) {
                 $user = $this->userRepo->findOneBy(['id' => $sbt['user_id']]);
                 $event = $this->eventRepo->findOneBy(['id' => $sbt['event_id']]);
-                //ToDo: сохранение адреса владельца!
                 $sbtToken = (new SbtToken())
                     ->setUser($user)
                     ->setAttestEvent($event)
                     ->setChainId($event->getChainId())
                     ->setContract($event->getContract())
-                    //->setOwnerAddress()
+                    ->setOwnerAddress('0x' . substr($event->getTopic1(), 26, 40))
+                    ->setIdInContractHex($event->getTopic2())
                     ->setIdInContract(hexdec($event->getTopic2()));
                 $this->em->persist($sbtToken);
             }

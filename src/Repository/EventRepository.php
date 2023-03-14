@@ -52,11 +52,13 @@ class EventRepository extends EntityRepository
             SELECT s.id as sbt_id, e.id as event_id FROM sbt_tokens s
             INNER JOIN events e ON (
                 substring(s.owner_address from 3) = substring(e.topic_1 from 27)
-                AND e.name IN (:names) AND s.revoke_event_id IS NULL
+                AND s.chain_id = e.chain_id AND s.contract = e.contract
+                AND s.id_in_contract_hex = e.topic_2
+                AND e.name IN (:nameRevoke, :nameBurn) AND s.revoke_event_id IS NULL
             )
         ';
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $result = $stmt->executeQuery(['names' => [Event::NAME_SBT_REVOKE, Event::NAME_SBT_BURN]]);
+        $result = $stmt->executeQuery(['nameRevoke' => Event::NAME_SBT_REVOKE, 'nameBurn' => Event::NAME_SBT_BURN]);
         return $result->fetchAllAssociative();
     }
 }

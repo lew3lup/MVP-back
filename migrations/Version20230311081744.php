@@ -29,13 +29,15 @@ final class Version20230311081744 extends AbstractMigration
             chain_id integer not null,
             contract char (42) not null,
             id_in_contract integer not null,
+            id_in_contract_hex char(66) not null,
             owner_address char (42) not null,
             attest_event_id integer not null,
             revoke_event_id integer null,
             PRIMARY KEY (id),
             FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
             FOREIGN KEY (attest_event_id) REFERENCES events ON DELETE RESTRICT,
-            FOREIGN KEY (revoke_event_id) REFERENCES events ON DELETE RESTRICT
+            FOREIGN KEY (revoke_event_id) REFERENCES events ON DELETE RESTRICT,
+            UNIQUE (chain_id, contract, id_in_contract)
         )');
     }
 

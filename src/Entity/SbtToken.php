@@ -50,6 +50,13 @@ class SbtToken
      */
     private $idInContract;
     /**
+     * ID токена в рамках контракта в шестнадцатиричном виде
+     *
+     * @var string
+     * @ORM\Column(type="string", length=66, name="id_in_contract_hex")
+     */
+    private $idInContractHex;
+    /**
      * ETH-адрес владельца
      *
      * @var string
@@ -146,6 +153,24 @@ class SbtToken
     public function setIdInContract(int $idInContract): SbtToken
     {
         $this->idInContract = $idInContract;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdInContractHex(): string
+    {
+        return $this->idInContractHex;
+    }
+
+    /**
+     * @param string $idInContractHex
+     * @return SbtToken
+     */
+    public function setIdInContractHex(string $idInContractHex): SbtToken
+    {
+        $this->idInContractHex = $idInContractHex;
         return $this;
     }
 
