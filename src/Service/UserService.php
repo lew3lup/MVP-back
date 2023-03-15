@@ -15,6 +15,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Google\Client;
 use Google_Service_Oauth2;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -28,6 +29,8 @@ class UserService
     private $userRepo;
     /** @var ParameterBagInterface */
     private $parameterBag;
+    /** @var LoggerInterface */
+    private $logger;
     /** @var GethApiService */
     private $gethApiService;
 
@@ -39,17 +42,20 @@ class UserService
      * @param EntityManagerInterface $em
      * @param UserRepository $userRepo
      * @param ParameterBagInterface $parameterBag
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Client $googleClient,
         EntityManagerInterface $em,
         UserRepository $userRepo,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        LoggerInterface $logger
     ) {
         $this->googleClient = $googleClient;
         $this->em = $em;
         $this->userRepo = $userRepo;
         $this->parameterBag = $parameterBag;
+        $this->logger = $logger;
         $this->gethApiService = new GethApiService($parameterBag->get('gethAddress'));
         $this->redis = RedisAdapter::createConnection($parameterBag->get('redisSettings')['dsn']);
     }
@@ -265,6 +271,7 @@ class UserService
         try {
             $signerAddress = $this->gethApiService->recoverSignerAddress('0x' . bin2hex($message), $signature);
         } catch (Exception $e) {
+            $this->logger->error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
             throw new ForbiddenException();
         }
         //Сверяем полученный адрес с имеющимся
