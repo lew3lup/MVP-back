@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     /**
-     * @Route("get-metamask-login-message", name="get-metamask-login-message", methods={"POST"})
+     * @Route("get-metamask-login-message", name="get-metamask-login-message", methods={"GET"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
@@ -36,7 +36,7 @@ class MainController extends AbstractController
         EntityManagerInterface $em,
         UserService $userService
     ): JsonResponse {
-        $address = $request->request->get('address');
+        $address = $request->query->get('address');
         if (!$address) {
             throw new RequestDataException();
         }
