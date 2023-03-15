@@ -95,8 +95,10 @@ class UserService
      */
     public function linkMetamask(User $user, string $address, string $signature): void
     {
+        if ($user->getAddress()) {
+            throw new ForbiddenException();
+        }
         $address = strtolower($address);
-        //ToDo: возможно стоит выбрасывать исключение, если у пользователя уже привязан адрес
         $this->checkSignature($address, $signature);
         if ($this->userRepo->findOneByAddress($address)) {
             throw new ForbiddenException('Address already in use');

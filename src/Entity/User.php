@@ -242,6 +242,7 @@ class User implements JsonSerializable
     {
         return [
             'address'   => $this->address,
+            'email'     => $this->email,
         ];
     }
 }
