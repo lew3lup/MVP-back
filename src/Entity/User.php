@@ -240,9 +240,16 @@ class User implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
+        $lew3lupIdTokens = [];
+        foreach ($this->sbtTokens as $sbtToken) {
+            if ($sbtToken->getType() === SbtToken::TYPE_LEW3LUP_ID && $sbtToken->getRevokeEvent() === null) {
+                $lew3lupIdTokens[] = $sbtToken;
+            }
+        }
         return [
-            'address'   => $this->address,
-            'email'     => $this->email,
+            'address'           => $this->address,
+            'email'             => $this->email,
+            'lew3lupIdTokens'   => $lew3lupIdTokens,
         ];
     }
 }

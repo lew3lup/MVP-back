@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * Сущность SBT-токена
@@ -13,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class SbtToken
  * @package App\Entity
  */
-class SbtToken
+class SbtToken implements JsonSerializable
 {
     public const TYPE_LEW3LUP_ID = 1;
     public const TYPE_BABT = 2;
@@ -239,7 +240,7 @@ class SbtToken
     /**
      * @return Event
      */
-    public function getRevokeEvent(): Event
+    public function getRevokeEvent(): ?Event
     {
         return $this->revokeEvent;
     }
@@ -252,5 +253,16 @@ class SbtToken
     {
         $this->revokeEvent = $revokeEvent;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'chainId'       => $this->chainId,
+            'idInContract'  => $this->idInContract
+        ];
     }
 }
