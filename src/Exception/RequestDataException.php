@@ -11,6 +11,6 @@ class RequestDataException extends DomainException
      */
     public function __construct()
     {
-        $this->message = 'Please fill in all required fields';
+        parent::__construct('Please fill in all required fields', 400);
     }
 }
