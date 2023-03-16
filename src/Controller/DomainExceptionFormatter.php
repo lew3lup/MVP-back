@@ -9,13 +9,21 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class DomainExceptionFormatter implements EventSubscriberInterface
 {
+    /** @var ErrorHandler */
     private $errors;
 
+    /**
+     * DomainExceptionFormatter constructor.
+     * @param ErrorHandler $errors
+     */
     public function __construct(ErrorHandler $errors)
     {
         $this->errors = $errors;
     }
 
+    /**
+     * @return array|string[]
+     */
     public static function getSubscribedEvents(): array
     {
         return array(
@@ -23,6 +31,9 @@ class DomainExceptionFormatter implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param ExceptionEvent $event
+     */
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
