@@ -186,6 +186,34 @@ class User implements JsonSerializable
     }
 
     /**
+     * @return array
+     */
+    public function getLew3lupIdTokens(): array
+    {
+        $lew3lupIdTokens = [];
+        foreach ($this->sbtTokens as $sbtToken) {
+            if ($sbtToken->getType() === SbtToken::TYPE_LEW3LUP_ID && $sbtToken->getRevokeEvent() === null) {
+                $lew3lupIdTokens[] = $sbtToken;
+            }
+        }
+        return $lew3lupIdTokens;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBabtTokens(): array
+    {
+        $babtTokens = [];
+        foreach ($this->sbtTokens as $sbtToken) {
+            if ($sbtToken->getType() === SbtToken::TYPE_BABT && $sbtToken->getRevokeEvent() === null) {
+                $babtTokens[] = $sbtToken;
+            }
+        }
+        return $babtTokens;
+    }
+
+    /**
      * @return Collection|UserAchievement[]
      */
     public function getUserAchievements(): Collection
@@ -236,20 +264,23 @@ class User implements JsonSerializable
     }
 
     /**
+     * @return bool
+     */
+    public function isVerified(): bool
+    {
+        $userFractal = $this->getUserFractal();
+        return ($userFractal && $userFractal->isApproved()) || !empty($this->getBabtTokens());
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
     {
-        $lew3lupIdTokens = [];
-        foreach ($this->sbtTokens as $sbtToken) {
-            if ($sbtToken->getType() === SbtToken::TYPE_LEW3LUP_ID && $sbtToken->getRevokeEvent() === null) {
-                $lew3lupIdTokens[] = $sbtToken;
-            }
-        }
         return [
             'address'           => $this->address,
             'email'             => $this->email,
-            'lew3lupIdTokens'   => $lew3lupIdTokens,
+            'lew3lupIdTokens'   => $this->getLew3lupIdTokens(),
         ];
     }
 }
