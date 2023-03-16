@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SbtToken
 {
+    public const TYPE_LEW3LUP_ID = 1;
+    public const TYPE_BABT = 2;
+
     /**
      * @var int
      * @ORM\Column(type="integer")
@@ -22,6 +25,11 @@ class SbtToken
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+    /**
+     * @var int
+     * @ORM\Column(type="smallint")
+     */
+    private $type;
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="User", inversedBy="sbtTokens")
@@ -82,6 +90,24 @@ class SbtToken
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     * @return SbtToken
+     */
+    public function setType(int $type): SbtToken
+    {
+        $this->type = $type;
+        return $this;
     }
 
     /**
