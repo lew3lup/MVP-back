@@ -144,7 +144,7 @@ contract Lew3lUpId is Ownable, ERC165, ISBT721, IERC721Metadata {
     }
 
     function _verifySignature(address to, bytes memory sign) internal view returns (bool) {
-        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", to));
+        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(abi.encodePacked(to))));
         address[] memory signList = _recoverAddresses(hash, sign);
         return signList[0] == _signer;
     }

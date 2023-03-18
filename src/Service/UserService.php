@@ -16,6 +16,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Google\Client;
 use Google_Service_Oauth2;
+use kornrunner\Keccak;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -218,7 +219,8 @@ class UserService
             throw new ForbiddenException();
         }
         $signer = $this->parameterBag->get('signer');
-        return $this->gethApiService->sign($user->getAddress(), $signer['address'], $signer['password']);
+        $dataToSign = '0x' . Keccak::hash(hex2bin(str_replace('0x', '', $user->getAddress())), 256);
+        return $this->gethApiService->sign($dataToSign, $signer['address'], $signer['password']);
     }
 
     /**
