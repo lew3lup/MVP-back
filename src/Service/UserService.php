@@ -207,11 +207,18 @@ class UserService
         return $user;
     }
 
+    /**
+     * @param User $user
+     * @return string
+     * @throws Exception
+     */
     public function generateLew3lupIdMintingSignature(User $user): string
     {
-        if (!$user->isVerified()) {
-            //ToDo: выбрасываем исключение
+        if (!$user->getAddress() || !$user->isVerified()) {
+            throw new ForbiddenException();
         }
+        $signer = $this->parameterBag->get('signer');
+        return $this->gethApiService->sign($user->getAddress(), $signer['address'], $signer['password']);
     }
 
     /**

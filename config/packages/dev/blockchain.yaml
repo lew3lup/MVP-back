@@ -8,9 +8,10 @@ parameters:
       explorerUrl: "https://goerli.etherscan.io",
       currencySymbol: "ETH",
       contractAddress: "0x29ae22cce8dd1e706958648e73f7db3ce61c7f6c",
-      signerAddress: "0x4c4c3ac32fd4999b0d4935e222c6d6f266d65ad1",
-      signerPassword: "12345",
       chainName: "Goerli Testnet"
     }
   }
   gethAddress: "http://localhost:8545/"
+  signer:
+    address: "0x1b94bf2967c352322c72adddfe41244ccab07d45"
+    password: "12345678"

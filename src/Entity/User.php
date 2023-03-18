@@ -280,6 +280,7 @@ class User implements JsonSerializable
         return [
             'address'           => $this->address,
             'email'             => $this->email,
+            'isVerified'        => $this->isVerified(),
             'lew3lupIdTokens'   => $this->getLew3lupIdTokens(),
         ];
     }

@@ -278,6 +278,24 @@ class MainController extends AbstractController
     }
 
     /**
+     * @Route("get-lew3lup-id-minting-signature", name="get-lew3lup-id-minting-signatur", methods={"GET"})
+     *
+     * @param Request $request
+     * @param UserService $userService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function getLew3lupIdMintingSignature(Request $request, UserService $userService): JsonResponse
+    {
+        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $signature = $userService->generateLew3lupIdMintingSignature($user);
+        return $this->json([
+            'type' => 'success',
+            'data' => $signature
+        ]);
+    }
+
+    /**
      * @Route("get-metamask-login-message", methods={"OPTIONS"})
      * @Route("metamask-login", methods={"OPTIONS"})
      * @Route("link-metamask", methods={"OPTIONS"})
@@ -287,6 +305,7 @@ class MainController extends AbstractController
      * @Route("get-service-login-redirect", methods={"OPTIONS"})
      * @Route("get-blockchain-config", methods={"OPTIONS"})
      * @Route("get-verification-init-data", methods={"OPTIONS"})
+     * @Route("get-lew3lup-id-minting-signature", methods={"OPTIONS"})
      */
     public function options(): Response
     {
