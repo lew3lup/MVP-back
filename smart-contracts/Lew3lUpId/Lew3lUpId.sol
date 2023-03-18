@@ -10,7 +10,7 @@ import "./Counters.sol";
 import "./Strings.sol";
 import "./ERC165.sol";
 
-contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
+contract Lew3lUpId is Ownable, ERC165, ISBT721, IERC721Metadata {
     using Strings for uint256;
     using Counters for Counters.Counter;
     using EnumerableMap for EnumerableMap.AddressToUintMap;
