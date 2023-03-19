@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\User;
-use App\Entity\UserFractal;
 use App\Exception\ForbiddenException;
 use App\Exception\IncorrectEthAddressException;
 use App\Exception\IncorrectSignatureException;

@@ -7,7 +7,7 @@ parameters:
       rpcUrl: "",
       explorerUrl: "https://goerli.etherscan.io",
       currencySymbol: "ETH",
-      contractAddress: "0x29ae22cce8dd1e706958648e73f7db3ce61c7f6c",
+      contractAddress: "0x661376f443f2f031f220fb6245a5a9cc8d832493",
       chainName: "Goerli Testnet"
     }
   }
