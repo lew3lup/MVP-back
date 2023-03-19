@@ -15,6 +15,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Google\Client;
 use Google_Service_Oauth2;
+use kornrunner\Keccak;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -204,6 +205,21 @@ class UserService
             throw new UnauthorizedException();
         }
         return $user;
+    }
+
+    /**
+     * @param User $user
+     * @return string
+     * @throws Exception
+     */
+    public function generateLew3lupIdMintingSignature(User $user): string
+    {
+        if (!$user->getAddress() || !$user->isVerified()) {
+            throw new ForbiddenException();
+        }
+        $signer = $this->parameterBag->get('signer');
+        $dataToSign = '0x' . Keccak::hash(hex2bin(str_replace('0x', '', $user->getAddress())), 256);
+        return $this->gethApiService->sign($dataToSign, $signer['address'], $signer['password']);
     }
 
     /**

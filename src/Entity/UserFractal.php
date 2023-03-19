@@ -156,4 +156,12 @@ class UserFractal
         $this->status = $status;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isApproved(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
+    }
 }

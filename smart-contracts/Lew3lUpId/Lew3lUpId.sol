@@ -10,7 +10,7 @@ import "./Counters.sol";
 import "./Strings.sol";
 import "./ERC165.sol";
 
-contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
+contract Lew3lUpId is Ownable, ERC165, ISBT721, IERC721Metadata {
     using Strings for uint256;
     using Counters for Counters.Counter;
     using EnumerableMap for EnumerableMap.AddressToUintMap;
@@ -144,7 +144,7 @@ contract LEW3L_UP_ID is Ownable, ERC165, ISBT721, IERC721Metadata {
     }
 
     function _verifySignature(address to, bytes memory sign) internal view returns (bool) {
-        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", to));
+        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(abi.encodePacked(to))));
         address[] memory signList = _recoverAddresses(hash, sign);
         return signList[0] == _signer;
     }
