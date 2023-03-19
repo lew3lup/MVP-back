@@ -1,8 +1,9 @@
 parameters:
   blockchain: {
     5: {
-      parser: "EtherscanEventParser",
-      apiDomain: "api-goerli.etherscan.io",
+      parser: "GethEventParser",
+      apiDomain: "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      startBlock: 8680377,
       apiKey: "1YHP4X7F3CG2WKMZ3MSMGTCFXITYWVV6H5",
       rpcUrl: "",
       explorerUrl: "https://goerli.etherscan.io",
