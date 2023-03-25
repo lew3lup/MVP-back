@@ -9,10 +9,7 @@ abstract class SerializableEntity implements JsonSerializable
     /**
      * @return array
      */
-    public function jsonSerialize(): array
-    {
-        return [];
-    }
+    abstract public function jsonSerialize(): array;
 
     /**
      * @return array

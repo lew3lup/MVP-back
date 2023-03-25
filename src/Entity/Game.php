@@ -104,4 +104,28 @@ class Game extends SerializableEntity
     {
         return $this->admins;
     }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'url'           => $this->url,
+            'descriptions'  => $this->descriptions->toArray(),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerializeDetailed(): array
+    {
+        $quests = [];
+        foreach ($this->quests as $quest) {
+            $quests[] = $quest->jsonSerializeDetailed();
+        }
+        return array_merge($this->jsonSerialize(), ['quests' => $quests]);
+    }
 }

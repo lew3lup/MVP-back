@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-abstract class Description
+use Doctrine\ORM\Mapping as ORM;
+
+abstract class Description extends SerializableEntity
 {
     /**
      * @var int
@@ -10,28 +12,28 @@ abstract class Description
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
     /**
      * Двухсимвольный код языка ISO 639-1
      *
      * @var string
      * @ORM\Column(type="string", length=2)
      */
-    private $lang;
+    protected $lang;
     /**
      * Название сущности на указанном языке
      *
      * @var string
      * @ORM\Column(type="text")
      */
-    private $name;
+    protected $name;
     /**
      * Текстовое описание сущности на указанном языке
      *
      * @var string
      * @ORM\Column(type="text")
      */
-    private $description;
+    protected $description;
 
     /**
      * @return int
@@ -93,5 +95,18 @@ abstract class Description
     {
         $this->description = $description;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'lang'          => $this->lang,
+            'name'          => $this->name,
+            'description'   => $this->description,
+        ];
     }
 }
