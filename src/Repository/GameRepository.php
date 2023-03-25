@@ -15,5 +15,14 @@ use Doctrine\ORM\EntityRepository;
  */
 class GameRepository extends EntityRepository
 {
-
+    /**
+     * @param int $id
+     * @param int $adminId
+     * @return Game|null
+     */
+    public function findOneByIdAndAdminId(int $id, int $adminId): ?Game
+    {
+        //ToDo
+        return null;
+    }
 }

@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Game
  * @package App\Entity
  */
-class Game
+class Game extends SerializableEntity
 {
     /**
      * @var int

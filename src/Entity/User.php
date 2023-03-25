@@ -6,7 +6,6 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
 
 /**
  * Сущность пользователя
@@ -17,7 +16,7 @@ use JsonSerializable;
  * Class User
  * @package App\Entity
  */
-class User implements JsonSerializable
+class User extends SerializableEntity
 {
     /**
      * @var int
@@ -83,6 +82,11 @@ class User implements JsonSerializable
      * @ORM\OneToMany(targetEntity="UserFractal", mappedBy="user")
      */
     private $userFractals;
+    /**
+     * @var GameAdmin[]
+     * @ORM\OneToMany(targetEntity="GameAdmin", mappedBy="user")
+     */
+    private $admins;
 
     /**
      * User constructor.
@@ -95,6 +99,7 @@ class User implements JsonSerializable
         $this->referrals = new ArrayCollection();
         $this->partners = new ArrayCollection();
         $this->userFractals = new ArrayCollection();
+        $this->admins = new ArrayCollection();
     }
 
     /**
@@ -254,6 +259,26 @@ class User implements JsonSerializable
     }
 
     /**
+     * @return Collection|GameAdmin
+     */
+    public function getAdmins(): Collection
+    {
+        return $this->admins;
+    }
+
+    /**
+     * @return Game[]
+     */
+    public function getAdministeredGames(): array
+    {
+        $games = [];
+        foreach ($this->admins as $admin) {
+            $games[] = $admin->getGame();
+        }
+        return $games;
+    }
+
+    /**
      * @return UserFractal|null
      */
     public function getUserFractal(): ?UserFractal
@@ -282,6 +307,7 @@ class User implements JsonSerializable
             'email'             => $this->email,
             'isVerified'        => $this->isVerified(),
             'lew3lupIdTokens'   => $this->getLew3lupIdTokens(),
+            'administeredGames' => $this->getAdministeredGames(),
         ];
     }
 }

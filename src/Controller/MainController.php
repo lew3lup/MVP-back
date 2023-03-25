@@ -27,13 +27,11 @@ class MainController extends AbstractController
      * @Route("get-metamask-login-message", name="get-metamask-login-message", methods={"GET"})
      *
      * @param Request $request
-     * @param EntityManagerInterface $em
      * @param UserService $userService
      * @return JsonResponse
      */
     public function getMetamaskLoginMessage(
         Request $request,
-        EntityManagerInterface $em,
         UserService $userService
     ): JsonResponse {
         $address = $request->query->get('address');
@@ -41,7 +39,6 @@ class MainController extends AbstractController
             throw new RequestDataException();
         }
         $loginMessage = $userService->getMetamaskLoginMessage($address);
-        $em->flush();
         return $this->json([
             'type' => 'success',
             'loginMessage' => $loginMessage
