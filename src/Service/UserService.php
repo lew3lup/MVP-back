@@ -245,7 +245,7 @@ class UserService
     {
         $secretKey = $this->parameterBag->get('jwtSecretKey');
         $issuedAt = new DateTimeImmutable();
-        $expireAt = $issuedAt->modify('+60 minutes');
+        $expireAt = $issuedAt->modify('+24 hours');
         $data = [
             'iat' => $issuedAt->getTimestamp(),
             'nbf' => $issuedAt->getTimestamp(),

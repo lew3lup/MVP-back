@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,6 +38,26 @@ class Quest extends SerializableEntity
      * @ORM\Column(type="integer")
      */
     private $type;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $active = true;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted = false;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="added_at")
+     */
+    private $addedAt;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="deleted_at", nullable=true)
+     */
+    private $deletedAt;
     /**
      * @var QuestDescription[]
      * @ORM\OneToMany(targetEntity="QuestDescription", mappedBy="quest")
@@ -108,6 +129,54 @@ class Quest extends SerializableEntity
     }
 
     /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return Quest
+     */
+    public function setActive(bool $active): Quest
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return Quest
+     */
+    public function delete(): Quest
+    {
+        if (!$this->deleted) {
+            $this->deleted = true;
+            $this->deletedAt = new DateTimeImmutable();
+        }
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getAddedAt(): DateTimeImmutable
+    {
+        return $this->addedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $addedAt
+     * @return Quest
+     */
+    public function setAddedAt(DateTimeImmutable $addedAt): Quest
+    {
+        $this->addedAt = $addedAt;
+        return $this;
+    }
+
+    /**
      * @return Collection|QuestDescription[]
      */
     public function getDescriptions(): Collection
@@ -140,6 +209,9 @@ class Quest extends SerializableEntity
      */
     public function jsonSerializeDetailed(): array
     {
-        return array_merge($this->jsonSerialize(), ['tasks' => $this->tasks->toArray()]);
+        return array_merge($this->jsonSerialize(), [
+            'active'    => $this->active,
+            'tasks'     => $this->tasks->toArray(),
+        ]);
     }
 }
