@@ -22,7 +22,20 @@ class GameRepository extends EntityRepository
      */
     public function findOneByIdAndAdminId(int $id, int $adminId): ?Game
     {
-        //ToDo
+        $result = $this->createQueryBuilder('g')
+            ->innerJoin('g.admins', 'ga')
+            ->innerJoin('ga.user', 'u')
+            ->where('g.id = :id')
+            ->andWhere('u.id = :adminId')
+            ->setParameter('id', $id)
+            ->setParameter('adminId', $adminId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+        if (!empty($result)) {
+            return $result[0];
+        }
         return null;
     }
 }

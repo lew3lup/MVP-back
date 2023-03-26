@@ -9,9 +9,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class GameAdminController
+ * @package App\Controller
+ * @Route("game-admin/")
+ */
 class GameAdminController extends AbstractController
 {
     /**
+     * @Route("game/{gameId}", methods={"GET"})
+     *
      * @param int $gameId
      * @param Request $request
      * @param UserService $userService
@@ -33,6 +40,8 @@ class GameAdminController extends AbstractController
     }
 
     /**
+     * @Route("game/{gameId}", methods={"PUT"})
+     *
      * @param int $gameId
      * @param Request $request
      * @param UserService $userService

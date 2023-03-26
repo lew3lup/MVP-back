@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class QuestTask
  * @package App\Entity
  */
-class QuestTask
+class QuestTask extends SerializableEntity
 {
     /**
      * @var int
@@ -90,5 +90,16 @@ class QuestTask
     public function getUserQuestTasks(): Collection
     {
         return $this->userQuestTasks;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'descriptions'  => $this->descriptions->toArray(),
+        ];
     }
 }

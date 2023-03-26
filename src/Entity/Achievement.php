@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Achievement
  * @package App\Entity
  */
-class Achievement
+class Achievement extends SerializableEntity
 {
     /**
      * @var int
@@ -66,5 +66,16 @@ class Achievement
     public function getUserAchievements(): Collection
     {
         return $this->userAchievements;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'descriptions'  => $this->descriptions->toArray(),
+        ];
     }
 }
