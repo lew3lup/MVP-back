@@ -194,7 +194,9 @@ class Game extends SerializableEntity
     {
         $quests = [];
         foreach ($this->quests as $quest) {
-            $quests[] = $quest->jsonSerializeDetailed();
+            if (!$quest->isDeleted()) {
+                $quests[] = $quest->jsonSerializeDetailed();
+            }
         }
         return array_merge($this->jsonSerialize(), ['quests' => $quests]);
     }

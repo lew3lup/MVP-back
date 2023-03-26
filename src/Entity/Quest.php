@@ -159,6 +159,14 @@ class Quest extends SerializableEntity
     }
 
     /**
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    /**
      * @return DateTimeImmutable
      */
     public function getAddedAt(): DateTimeImmutable
@@ -209,9 +217,15 @@ class Quest extends SerializableEntity
      */
     public function jsonSerializeDetailed(): array
     {
+        $tasks = [];
+        foreach ($this->tasks as $task) {
+            if (!$task->isDeleted()) {
+                $tasks[] = $task->jsonSerializeDetailed();
+            }
+        }
         return array_merge($this->jsonSerialize(), [
             'active'    => $this->active,
-            'tasks'     => $this->tasks->toArray(),
+            'tasks'     => $tasks,
         ]);
     }
 }

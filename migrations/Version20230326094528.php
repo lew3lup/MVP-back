@@ -26,6 +26,8 @@ final class Version20230326094528 extends AbstractMigration
             ADD COLUMN added_at timestamp(0) default now() not null,
             ADD COLUMN deleted_at timestamp(0) default null
         ');
+        $this->addSql('CREATE INDEX games_active ON games (active)');
+        $this->addSql('CREATE INDEX games_deleted ON games (deleted)');
 
         //Quest
         $this->addSql('ALTER TABLE quests
@@ -34,6 +36,8 @@ final class Version20230326094528 extends AbstractMigration
             ADD COLUMN added_at timestamp(0) default now() not null,
             ADD COLUMN deleted_at timestamp(0) default null
         ');
+        $this->addSql('CREATE INDEX quests_active ON quests (active)');
+        $this->addSql('CREATE INDEX quests_deleted ON quests (deleted)');
 
         //QuestTask
         $this->addSql('ALTER TABLE quests_tasks
@@ -42,6 +46,8 @@ final class Version20230326094528 extends AbstractMigration
             ADD COLUMN added_at timestamp(0) default now() not null,
             ADD COLUMN deleted_at timestamp(0) default null
         ');
+        $this->addSql('CREATE INDEX quests_tasks_active ON quests_tasks (active)');
+        $this->addSql('CREATE INDEX quests_tasks_deleted ON quests_tasks (deleted)');
     }
 
     public function down(Schema $schema): void

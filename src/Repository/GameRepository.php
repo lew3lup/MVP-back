@@ -26,6 +26,7 @@ class GameRepository extends EntityRepository
             ->innerJoin('g.admins', 'ga')
             ->innerJoin('ga.user', 'u')
             ->where('g.id = :id')
+            ->andWhere('g.deleted = false')
             ->andWhere('u.id = :adminId')
             ->setParameter('id', $id)
             ->setParameter('adminId', $adminId)

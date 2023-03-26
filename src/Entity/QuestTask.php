@@ -128,6 +128,14 @@ class QuestTask extends SerializableEntity
     }
 
     /**
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    /**
      * @return DateTimeImmutable
      */
     public function getAddedAt(): DateTimeImmutable

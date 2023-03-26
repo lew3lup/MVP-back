@@ -27,6 +27,7 @@ class QuestRepository extends EntityRepository
             ->innerJoin('g.admins', 'ga')
             ->innerJoin('ga.user', 'u')
             ->where('q.id = :id')
+            ->andWhere('q.deleted = false')
             ->andWhere('u.id = :adminId')
             ->setParameter('id', $id)
             ->setParameter('adminId', $adminId)
