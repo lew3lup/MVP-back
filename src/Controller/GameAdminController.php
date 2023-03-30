@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Quest;
 use App\Entity\User;
 use App\Service\GameService;
 use App\Service\QuestService;
@@ -104,11 +105,32 @@ class GameAdminController extends AbstractController
         //ToDo
     }
 
-    public function addQuest()
-    {
-        //ToDo
+    public function addQuest(
+        int $gameId,
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $game = $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId());
+        //ToDo, вынести создание в сервис
+        $quest = new Quest();
+        $em->persist($quest);
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $quest->jsonSerializeDetailed()
+        ]);
     }
 
+    /**
+     * @Route("quest/{questId}", methods={"PUT"})
+     *
+     * @param int $questId
+     * @param Request $request
+     * @param QuestService $questService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
     public function updateQuest(
         int $questId,
         Request $request,
@@ -125,6 +147,8 @@ class GameAdminController extends AbstractController
     }
 
     /**
+     * @Route("quest/{questId}", methods={"DELETE"})
+     *
      * @param int $questId
      * @param Request $request
      * @param QuestService $questService
