@@ -293,6 +293,29 @@ class MainController extends AbstractController
     }
 
     /**
+     * @Route("set-username", name="set-username", methods={"POST"})
+     *
+     * @param Request $request
+     * @param UserService $userService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function setUsername(Request $request, UserService $userService, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $name = $request->request->get('name');
+        if (!$name) {
+            throw new RequestDataException();
+        }
+        $user->setName($name);
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'user' => $user
+        ]);
+    }
+
+    /**
      * @Route("get-metamask-login-message", methods={"OPTIONS"})
      * @Route("metamask-login", methods={"OPTIONS"})
      * @Route("link-metamask", methods={"OPTIONS"})
@@ -303,6 +326,7 @@ class MainController extends AbstractController
      * @Route("get-blockchain-config", methods={"OPTIONS"})
      * @Route("get-verification-init-data", methods={"OPTIONS"})
      * @Route("get-lew3lup-id-minting-signature", methods={"OPTIONS"})
+     * @Route("set-username", methods={"OPTIONS"})
      */
     public function options(): Response
     {

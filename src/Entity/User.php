@@ -305,6 +305,7 @@ class User extends SerializableEntity
         return [
             'address'           => $this->address,
             'email'             => $this->email,
+            'name'              => $this->name,
             'isVerified'        => $this->isVerified(),
             'lew3lupIdTokens'   => $this->getLew3lupIdTokens(),
             'administeredGames' => $this->getAdministeredGames(),
