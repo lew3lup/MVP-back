@@ -33,4 +33,16 @@ class GameService
         }
         return $game;
     }
+
+    /**
+     * @param Game $game
+     * @param string $url
+     * @param bool $active
+     * @return Game
+     */
+    public function updateGame(Game $game, string $url, bool $active): Game
+    {
+        //ToDo: валидация $url
+        return $game->setUrl($url)->setActive($active);
+    }
 }

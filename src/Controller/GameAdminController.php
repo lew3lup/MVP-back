@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Quest;
 use App\Entity\User;
 use App\Service\GameService;
 use App\Service\QuestService;
+use App\Service\QuestTaskService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,8 +76,11 @@ class GameAdminController extends AbstractController
         GameService $gameService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $game = $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId());
-        //ToDo
+        $game = $gameService->updateGame(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            $request->get('url'),
+            $request->get('active')
+        );
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -105,16 +108,27 @@ class GameAdminController extends AbstractController
         //ToDo
     }
 
+    /**
+     * @Route("game/{gameId}/add-quest", methods={"POST"})
+     *
+     * @param int $gameId
+     * @param Request $request
+     * @param GameService $gameService
+     * @param QuestService $questService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
     public function addQuest(
         int $gameId,
         Request $request,
         GameService $gameService,
+        QuestService $questService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $game = $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId());
-        //ToDo, вынести создание в сервис
-        $quest = new Quest();
-        $em->persist($quest);
+        $quest = $questService->addQuest(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            $request->get('type')
+        );
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -137,8 +151,11 @@ class GameAdminController extends AbstractController
         QuestService $questService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $quest = $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId());
-        //ToDo
+        $quest = $questService->updateQuest(
+            $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
+            $request->get('type'),
+            $request->get('active')
+        );
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -161,8 +178,7 @@ class GameAdminController extends AbstractController
         QuestService $questService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $quest = $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId());
-        $quest->delete();
+        $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId())->delete();
         $em->flush();
         return $this->json(['type' => 'success']);
     }
@@ -182,19 +198,77 @@ class GameAdminController extends AbstractController
         //ToDo
     }
 
-    public function addQuestTask()
-    {
-        //ToDo
+    /**
+     * @Route("quest/{questId}/add-task", methods={"POST"})
+     *
+     * @param int $questId
+     * @param Request $request
+     * @param QuestService $questService
+     * @param QuestTaskService $questTaskService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function addQuestTask(
+        int $questId,
+        Request $request,
+        QuestService $questService,
+        QuestTaskService $questTaskService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $questTask = $questTaskService->addQuestTask(
+            $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId())
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $questTask->jsonSerializeDetailed()
+        ]);
     }
 
-    public function updateQuestTask()
-    {
-        //ToDo
+    /**
+     * @Route("task/{questTaskId}", methods={"PUT"})
+     *
+     * @param int $questTaskId
+     * @param Request $request
+     * @param QuestTaskService $questTaskService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function updateQuestTask(
+        int $questTaskId,
+        Request $request,
+        QuestTaskService $questTaskService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $questTask = $questTaskService->updateQuestTask(
+            $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
+            $request->get('active')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $questTask->jsonSerializeDetailed()
+        ]);
     }
 
-    public function removeQuestTask()
-    {
-        //ToDo
+    /**
+     * @Route("task/{questTaskId}", methods={"DELETE"})
+     *
+     * @param int $questTaskId
+     * @param Request $request
+     * @param QuestTaskService $questTaskService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeQuestTask(
+        int $questTaskId,
+        Request $request,
+        QuestTaskService $questTaskService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId())->delete();
+        $em->flush();
+        return $this->json(['type' => 'success']);
     }
 
     public function addQuestTaskDescription()

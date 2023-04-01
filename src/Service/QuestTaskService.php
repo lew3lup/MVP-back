@@ -2,21 +2,28 @@
 
 namespace App\Service;
 
+use App\Entity\Quest;
 use App\Entity\QuestTask;
 use App\Exception\NotFoundException;
 use App\Repository\QuestTaskRepository;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 
 class QuestTaskService
 {
+    /** @var EntityManagerInterface */
+    private $em;
     /** @var QuestTaskRepository */
     private $questTaskRepo;
 
     /**
      * QuestTaskService constructor.
+     * @param EntityManagerInterface $em
      * @param QuestTaskRepository $questTaskRepo
      */
-    public function __construct(QuestTaskRepository $questTaskRepo)
+    public function __construct(EntityManagerInterface $em, QuestTaskRepository $questTaskRepo)
     {
+        $this->em = $em;
         $this->questTaskRepo = $questTaskRepo;
     }
 
@@ -32,5 +39,26 @@ class QuestTaskService
             throw new NotFoundException();
         }
         return $questTask;
+    }
+
+    /**
+     * @param Quest $quest
+     * @return QuestTask
+     */
+    public function addQuestTask(Quest $quest): QuestTask
+    {
+        $questTask = (new QuestTask())->setQuest($quest)->setAddedAt(new DateTimeImmutable());
+        $this->em->persist($questTask);
+        return $questTask;
+    }
+
+    /**
+     * @param QuestTask $questTask
+     * @param bool $active
+     * @return QuestTask
+     */
+    public function updateQuestTask(QuestTask $questTask, bool $active): QuestTask
+    {
+        return $questTask->setActive($active);
     }
 }
