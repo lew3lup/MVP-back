@@ -204,19 +204,87 @@ class GameAdminController extends AbstractController
         return $this->json(['type' => 'success']);
     }
 
-    public function addQuestDescription()
-    {
-        //ToDo
+    /**
+     * @Route("quest/{questId}/add-description", methods={"POST"})
+     *
+     * @param int $questId
+     * @param Request $request
+     * @param QuestService $questService
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function addQuestDescription(
+        int $questId,
+        Request $request,
+        QuestService $questService,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $description = $descriptionService->addQuestDescription(
+            $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
+            $request->get('lang'),
+            $request->get('name'),
+            $request->get('description')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
-    public function updateQuestDescription()
-    {
-        //ToDo
+    /**
+     * @Route("quest-description/{questDescriptionId}", methods={"PUT"})
+     *
+     * @param int $questDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function updateQuestDescription(
+        int $questDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $description = $descriptionService->updateDescription(
+            $descriptionService->getQuestDescriptionByIdAndAdminId(
+                $questDescriptionId,
+                $this->getCurrentUser($request)->getId()
+            ),
+            $request->get('type'),
+            $request->get('active')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
-    public function removeQuestDescription()
-    {
-        //ToDo
+    /**
+     * @Route("quest-description/{questDescriptionId}", methods={"DELETE"})
+     *
+     * @param int $questDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeQuestDescription(
+        int $questDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $em->remove($descriptionService->getQuestDescriptionByIdAndAdminId(
+            $questDescriptionId,
+            $this->getCurrentUser($request)->getId()
+        ));
+        $em->flush();
+        return $this->json(['type' => 'success']);
     }
 
     /**
@@ -292,9 +360,34 @@ class GameAdminController extends AbstractController
         return $this->json(['type' => 'success']);
     }
 
-    public function addQuestTaskDescription()
-    {
-        //ToDo
+    /**
+     * @Route("task/{questTaskId}/add-description", methods={"POST"})
+     *
+     * @param int $questTaskId
+     * @param Request $request
+     * @param QuestTaskService $questTaskService
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function addQuestTaskDescription(
+        int $questTaskId,
+        Request $request,
+        QuestTaskService $questTaskService,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $description = $descriptionService->addQuestTaskDescription(
+            $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
+            $request->get('lang'),
+            $request->get('name'),
+            $request->get('description')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
     public function updateQuestTaskDescription()

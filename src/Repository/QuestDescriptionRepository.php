@@ -15,5 +15,29 @@ use Doctrine\ORM\EntityRepository;
  */
 class QuestDescriptionRepository extends EntityRepository
 {
-
+    /**
+     * @param int $id
+     * @param int $adminId
+     * @return QuestDescription|null
+     */
+    public function findOneByIdAndAdminId(int $id, int $adminId): ?QuestDescription
+    {
+        $result = $this->createQueryBuilder('qd')
+            ->innerJoin('qd.quest', 'q')
+            ->innerJoin('q.game', 'g')
+            ->innerJoin('g.admins', 'ga')
+            ->innerJoin('ga.user', 'u')
+            ->where('qd.id = :id')
+            ->andWhere('u.id = :adminId')
+            ->setParameter('id', $id)
+            ->setParameter('adminId', $adminId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+        if (!empty($result)) {
+            return $result[0];
+        }
+        return null;
+    }
 }
