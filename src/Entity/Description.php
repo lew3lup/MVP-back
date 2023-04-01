@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-abstract class Description extends SerializableEntity
+abstract class Description extends Serializable
 {
     /**
      * @var int

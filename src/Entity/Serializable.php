@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use JsonSerializable;
 
-abstract class SerializableEntity implements JsonSerializable
+abstract class Serializable implements JsonSerializable
 {
     /**
      * @return array

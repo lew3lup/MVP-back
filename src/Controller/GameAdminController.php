@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\DescriptionService;
 use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
@@ -88,14 +89,34 @@ class GameAdminController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("game/{gameId}/add-description", methods={"POST"})
+     *
+     * @param int $gameId
+     * @param Request $request
+     * @param GameService $gameService
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
     public function addGameDescription(
         int $gameId,
         Request $request,
         GameService $gameService,
+        DescriptionService $descriptionService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $game = $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId());
-        //ToDo
+        $description = $descriptionService->addGameDescription(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            $request->get('lang'),
+            $request->get('name'),
+            $request->get('description')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
     public function updateGameDescription()

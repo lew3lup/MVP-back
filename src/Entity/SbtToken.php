@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class SbtToken
  * @package App\Entity
  */
-class SbtToken extends SerializableEntity
+class SbtToken extends Serializable
 {
     public const TYPE_LEW3LUP_ID = 1;
     public const TYPE_BABT = 2;

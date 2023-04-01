@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class User
  * @package App\Entity
  */
-class User extends SerializableEntity
+class User extends Serializable
 {
     /**
      * @var int

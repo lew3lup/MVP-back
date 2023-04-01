@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Quest
  * @package App\Entity
  */
-class Quest extends SerializableEntity
+class Quest extends Descriptionable
 {
     /**
      * @var int
@@ -182,14 +182,6 @@ class Quest extends SerializableEntity
     {
         $this->addedAt = $addedAt;
         return $this;
-    }
-
-    /**
-     * @return Collection|QuestDescription[]
-     */
-    public function getDescriptions(): Collection
-    {
-        return $this->descriptions;
     }
 
     /**

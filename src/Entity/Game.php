@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Game
  * @package App\Entity
  */
-class Game extends SerializableEntity
+class Game extends Descriptionable
 {
     /**
      * @var int
@@ -148,14 +148,6 @@ class Game extends SerializableEntity
     {
         $this->addedAt = $addedAt;
         return $this;
-    }
-
-    /**
-     * @return Collection|GameDescription[]
-     */
-    public function getDescriptions(): Collection
-    {
-        return $this->descriptions;
     }
 
     /**

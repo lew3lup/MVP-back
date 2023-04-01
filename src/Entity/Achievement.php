@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Achievement
  * @package App\Entity
  */
-class Achievement extends SerializableEntity
+class Achievement extends Descriptionable
 {
     /**
      * @var int
@@ -50,14 +50,6 @@ class Achievement extends SerializableEntity
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection|AchievementDescription[]
-     */
-    public function getDescriptions(): Collection
-    {
-        return $this->descriptions;
     }
 
     /**
