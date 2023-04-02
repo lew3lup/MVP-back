@@ -13,7 +13,6 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,24 +20,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MainController extends AbstractController
+class MainController extends ApiController
 {
     /**
      * @Route("get-metamask-login-message", name="get-metamask-login-message", methods={"GET"})
      *
      * @param Request $request
-     * @param UserService $userService
      * @return JsonResponse
      */
-    public function getMetamaskLoginMessage(
-        Request $request,
-        UserService $userService
-    ): JsonResponse {
+    public function getMetamaskLoginMessage(Request $request): JsonResponse
+    {
         $address = $request->query->get('address');
         if (!$address) {
             throw new RequestDataException();
         }
-        $loginMessage = $userService->getMetamaskLoginMessage($address);
+        $loginMessage = $this->userService->getMetamaskLoginMessage($address);
         return $this->json([
             'type' => 'success',
             'loginMessage' => $loginMessage
@@ -50,20 +46,16 @@ class MainController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $em
-     * @param UserService $userService
      * @return JsonResponse
      */
-    public function metamaskLogin(
-        Request $request,
-        EntityManagerInterface $em,
-        UserService $userService
-    ): JsonResponse {
+    public function metamaskLogin(Request $request, EntityManagerInterface $em): JsonResponse
+    {
         $address = $request->request->get('address');
         $signature = $request->request->get('signature');
         if (!$address || !$signature) {
             throw new RequestDataException();
         }
-        [$user, $token] = $userService->metamaskLogin($address, $signature);
+        [$user, $token] = $this->userService->metamaskLogin($address, $signature);
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -75,14 +67,13 @@ class MainController extends AbstractController
     /**
      * @Route("get-google-login-url", name="get-google-login-url", methods={"GET"})
      *
-     * @param UserService $userService
      * @return JsonResponse
      */
-    public function getGoogleLoginUrl(UserService $userService): JsonResponse
+    public function getGoogleLoginUrl(): JsonResponse
     {
         return $this->json([
             'type' => 'success',
-            'link' => $userService->getGoogleLoginUrl()
+            'link' => $this->userService->getGoogleLoginUrl()
         ]);
     }
 
@@ -92,7 +83,6 @@ class MainController extends AbstractController
      * @param Request $request
      * @param ParameterBagInterface $parameterBag
      * @param EntityManagerInterface $em
-     * @param UserService $userService
      * @param LoggerInterface $logger
      * @return RedirectResponse
      */
@@ -100,14 +90,13 @@ class MainController extends AbstractController
         Request $request,
         ParameterBagInterface $parameterBag,
         EntityManagerInterface $em,
-        UserService $userService,
         LoggerInterface $logger
     ): RedirectResponse {
         //ToDo: поменять адрес редиректа, когда он будет известен
         $url = $parameterBag->get('frontDomain');
         try {
             if ($request->get('code')) {
-                [$user, $token] = $userService->googleLogin($request->get('code'));
+                [$user, $token] = $this->userService->googleLogin($request->get('code'));
                 $em->flush();
                 $url .= '?token=' . $token;
             }
@@ -121,17 +110,13 @@ class MainController extends AbstractController
      * @Route("get-user-data", name="get-user-data", methods={"GET"})
      *
      * @param Request $request
-     * @param UserService $userService
      * @return JsonResponse
      */
-    public function getUserData(
-        Request $request,
-        UserService $userService
-    ): JsonResponse {
-        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+    public function getUserData(Request $request): JsonResponse
+    {
         return $this->json([
             'type' => 'success',
-            'data' => $user
+            'data' => $this->getCurrentUser($request)
         ]);
     }
 
@@ -140,21 +125,17 @@ class MainController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $em
-     * @param UserService $userService
      * @return JsonResponse
      */
-    public function linkMetamask(
-        Request $request,
-        EntityManagerInterface $em,
-        UserService $userService
-    ): JsonResponse {
-        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+    public function linkMetamask(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
         $address = $request->request->get('address');
         $signature = $request->request->get('signature');
         if (!$address || !$signature) {
             throw new RequestDataException();
         }
-        $userService->linkMetamask($user, $address, $signature);
+        $this->userService->linkMetamask($user, $address, $signature);
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -194,17 +175,15 @@ class MainController extends AbstractController
      *
      * @param Request $request
      * @param ParameterBagInterface $parameterBag
-     * @param UserService $userService
      * @param FractalService $fractalService
      * @return JsonResponse
      */
     public function getVerificationInitData(
         Request $request,
         ParameterBagInterface $parameterBag,
-        UserService $userService,
         FractalService $fractalService
     ): JsonResponse {
-        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $user = $this->getCurrentUser($request);
         if ($user->getUserFractal()) {
             throw new ForbiddenException();
         }
@@ -278,17 +257,15 @@ class MainController extends AbstractController
      * @Route("get-lew3lup-id-minting-signature", name="get-lew3lup-id-minting-signatur", methods={"GET"})
      *
      * @param Request $request
-     * @param UserService $userService
      * @return JsonResponse
      * @throws Exception
      */
-    public function getLew3lupIdMintingSignature(Request $request, UserService $userService): JsonResponse
+    public function getLew3lupIdMintingSignature(Request $request): JsonResponse
     {
-        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
-        $signature = $userService->generateLew3lupIdMintingSignature($user);
+        $user = $this->getCurrentUser($request);
         return $this->json([
             'type' => 'success',
-            'data' => $signature
+            'data' => $this->userService->generateLew3lupIdMintingSignature($user)
         ]);
     }
 
@@ -296,13 +273,12 @@ class MainController extends AbstractController
      * @Route("set-username", name="set-username", methods={"POST"})
      *
      * @param Request $request
-     * @param UserService $userService
      * @param EntityManagerInterface $em
      * @return JsonResponse
      */
-    public function setUsername(Request $request, UserService $userService, EntityManagerInterface $em): JsonResponse
+    public function setUsername(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $user = $userService->getCurrentUser($request->headers->get('Authorization'));
+        $user = $this->getCurrentUser($request);
         $name = $request->request->get('name');
         if (!$name) {
             throw new RequestDataException();

@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -19,29 +20,8 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller
  * @Route("game-admin/")
  */
-class GameAdminController extends AbstractController
+class GameAdminController extends ApiController
 {
-    /** @var UserService */
-    private $userService;
-
-    /**
-     * GameAdminController constructor.
-     * @param UserService $userService
-     */
-    public function __construct(UserService $userService)
-    {
-        $this->userService = $userService;
-    }
-
-    /**
-     * @param Request $request
-     * @return User
-     */
-    private function getCurrentUser(Request $request): User
-    {
-        return $this->userService->getCurrentUser($request->headers->get('Authorization'));
-    }
-
     /**
      * @Route("game/{gameId}", methods={"GET"})
      *
@@ -119,14 +99,57 @@ class GameAdminController extends AbstractController
         ]);
     }
 
-    public function updateGameDescription()
-    {
-        //ToDo
+    /**
+     * @Route("game-description/{gameDescriptionId}", methods={"PUT"})
+     *
+     * @param int $gameDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function updateGameDescription(
+        int $gameDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $description = $descriptionService->updateDescription(
+            $descriptionService->getGameDescriptionByIdAndAdminId(
+                $gameDescriptionId,
+                $this->getCurrentUser($request)->getId()
+            ),
+            $request->get('name'),
+            $request->get('description')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
-    public function removeGameDescription()
-    {
-        //ToDo
+    /**
+     * @Route("game-description/{gameDescriptionId}", methods={"DELETE"})
+     *
+     * @param int $gameDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeGameDescription(
+        int $gameDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $em->remove($descriptionService->getGameDescriptionByIdAndAdminId(
+            $gameDescriptionId,
+            $this->getCurrentUser($request)->getId()
+        ));
+        $em->flush();
+        return $this->json(['type' => 'success']);
     }
 
     /**
@@ -254,8 +277,8 @@ class GameAdminController extends AbstractController
                 $questDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            $request->get('type'),
-            $request->get('active')
+            $request->get('name'),
+            $request->get('description')
         );
         $em->flush();
         return $this->json([
@@ -390,13 +413,76 @@ class GameAdminController extends AbstractController
         ]);
     }
 
-    public function updateQuestTaskDescription()
-    {
-        //ToDo
+    /**
+     * @Route("task-description/{questTaskDescriptionId}", methods={"PUT"})
+     *
+     * @param int $questTaskDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function updateQuestTaskDescription(
+        int $questTaskDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $description = $descriptionService->updateDescription(
+            $descriptionService->getQuestTaskDescriptionByIdAndAdminId(
+                $questTaskDescriptionId,
+                $this->getCurrentUser($request)->getId()
+            ),
+            $request->get('name'),
+            $request->get('description')
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $description->jsonSerializeDetailed()
+        ]);
     }
 
-    public function removeQuestTaskDescription()
+    /**
+     * @Route("task-description/{questTaskDescriptionId}", methods={"DELETE"})
+     *
+     * @param int $questTaskDescriptionId
+     * @param Request $request
+     * @param DescriptionService $descriptionService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeQuestTaskDescription(
+        int $questTaskDescriptionId,
+        Request $request,
+        DescriptionService $descriptionService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $em->remove($descriptionService->getQuestTaskDescriptionByIdAndAdminId(
+            $questTaskDescriptionId,
+            $this->getCurrentUser($request)->getId()
+        ));
+        $em->flush();
+        return $this->json(['type' => 'success']);
+    }
+
+    /**
+     * @Route("game/{gameId}", methods={"OPTIONS"})
+     * @Route("game/{gameId}/add-description", methods={"OPTIONS"})
+     * @Route("game-description/{gameDescriptionId}", methods={"OPTIONS"})
+     * @Route("game/{gameId}/add-quest", methods={"OPTIONS"})
+     * @Route("quest/{questId}", methods={"OPTIONS"})
+     * @Route("quest/{questId}/add-description", methods={"OPTIONS"})
+     * @Route("quest-description/{questDescriptionId}", methods={"OPTIONS"})
+     * @Route("quest/{questId}/add-task", methods={"OPTIONS"})
+     * @Route("task/{questTaskId}", methods={"OPTIONS"})
+     * @Route("task/{questTaskId}/add-description", methods={"OPTIONS"})
+     * @Route("task-description/{questTaskDescriptionId}", methods={"OPTIONS"})
+     */
+    public function options(): Response
     {
-        //ToDo
+        $response = new Response();
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+        return $response;
     }
 }
