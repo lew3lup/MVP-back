@@ -10,6 +10,7 @@ use App\Entity\QuestDescription;
 use App\Entity\QuestTask;
 use App\Entity\QuestTaskDescription;
 use App\Exception\NotFoundException;
+use App\Exception\RequestDataException;
 use App\Repository\GameDescriptionRepository;
 use App\Repository\QuestDescriptionRepository;
 use App\Repository\QuestTaskDescriptionRepository;
@@ -167,7 +168,9 @@ class DescriptionService
         string $name,
         string $description
     ): Description {
-        //ToDo: проверки
+        if (!$name || !$description) {
+            throw new RequestDataException();
+        }
         return $descriptionEntity->setName($name)->setDescription($description);
     }
 
@@ -184,7 +187,10 @@ class DescriptionService
         string $name,
         string $description
     ): Description {
-        //ToDo: проверять $lang на соответствие допустимым вариантам, а также $name и $description на непустоту
+        $lang = strtolower($lang);
+        if (!in_array($lang, Description::LANGS) || !$name || !$description) {
+            throw new RequestDataException();
+        }
         $descriptionEntity->setLang($lang)->setName($name)->setDescription($description);
         $this->em->persist($descriptionEntity);
         return $descriptionEntity;

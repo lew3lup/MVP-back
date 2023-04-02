@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 abstract class Description extends Serializable
 {
+    public const LANGS = ['en', 'ru'];
+
     /**
      * @var int
      * @ORM\Column(type="integer")
