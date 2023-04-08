@@ -12,6 +12,6 @@ class UnauthorizedException extends DomainException
      */
     public function __construct(?string $message = null)
     {
-        parent::__construct($message ?? 'Unauthorized', 401);
+        parent::__construct($message ?? 'UNAUTHORIZED', 401);
     }
 }

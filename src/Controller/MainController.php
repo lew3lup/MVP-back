@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\UserFractal;
-use App\Exception\ForbiddenException;
-use App\Exception\RequestDataException;
+use App\Exception\AlreadyVerifiedException;
+use App\Exception\BadRequestException;
 use App\Repository\UserRepository;
 use App\Service\FractalService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +31,7 @@ class MainController extends ApiController
     {
         $address = $request->query->get('address');
         if (!$address) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $loginMessage = $this->userService->getMetamaskLoginMessage($address);
         return $this->json([
@@ -52,7 +52,7 @@ class MainController extends ApiController
         $address = $request->request->get('address');
         $signature = $request->request->get('signature');
         if (!$address || !$signature) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         [$user, $token] = $this->userService->metamaskLogin($address, $signature);
         $em->flush();
@@ -132,7 +132,7 @@ class MainController extends ApiController
         $address = $request->request->get('address');
         $signature = $request->request->get('signature');
         if (!$address || !$signature) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $this->userService->linkMetamask($user, $address, $signature);
         $em->flush();
@@ -184,7 +184,7 @@ class MainController extends ApiController
     ): JsonResponse {
         $user = $this->getCurrentUser($request);
         if ($user->getUserFractal()) {
-            throw new ForbiddenException();
+            throw new AlreadyVerifiedException();
         }
         $state = JWT::encode(['userId' => $user->getId()], $parameterBag->get('jwtSecretKey'), 'HS512');
         return $this->json([
@@ -280,7 +280,7 @@ class MainController extends ApiController
         $user = $this->getCurrentUser($request);
         $name = $request->request->get('name');
         if (!$name) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $user->setName($name);
         $em->flush();

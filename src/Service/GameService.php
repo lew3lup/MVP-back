@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Entity\Game;
 use App\Exception\NotFoundException;
-use App\Exception\RequestDataException;
+use App\Exception\BadRequestException;
 use App\Repository\GameRepository;
 
 class GameService
@@ -43,7 +43,7 @@ class GameService
     public function updateGame(Game $game, array $data): Game
     {
         if (empty($data['url']) || !isset($data['active']) || !filter_var($data['url'], FILTER_VALIDATE_URL)) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         return $game->setUrl($data['url'])->setActive($data['active']);
     }

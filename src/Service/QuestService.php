@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\Game;
 use App\Entity\Quest;
 use App\Exception\NotFoundException;
-use App\Exception\RequestDataException;
+use App\Exception\BadRequestException;
 use App\Repository\QuestRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,7 +51,7 @@ class QuestService
     {
         //ToDo: проверка type на допустимость
         if (empty($data['type'])) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $quest = (new Quest())->setGame($game)->setType($data['type'])->setAddedAt(new DateTimeImmutable());
         $this->em->persist($quest);
@@ -67,7 +67,7 @@ class QuestService
     {
         //ToDo: проверка type на допустимость
         if (empty($data['type']) || !isset($data['active'])) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         return $quest->setType($data['type'])->setActive($data['active']);
     }

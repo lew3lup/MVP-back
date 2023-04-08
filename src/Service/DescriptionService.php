@@ -10,7 +10,7 @@ use App\Entity\QuestDescription;
 use App\Entity\QuestTask;
 use App\Entity\QuestTaskDescription;
 use App\Exception\NotFoundException;
-use App\Exception\RequestDataException;
+use App\Exception\BadRequestException;
 use App\Repository\GameDescriptionRepository;
 use App\Repository\QuestDescriptionRepository;
 use App\Repository\QuestTaskDescriptionRepository;
@@ -132,7 +132,7 @@ class DescriptionService
     public function updateDescription(Description $descriptionEntity, array $data): Description
     {
         if (empty($data['name']) || empty($data['description'])) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         return $descriptionEntity->setName($data['name'])->setDescription($data['description']);
     }
@@ -145,11 +145,11 @@ class DescriptionService
     private function addDescription(Description $descriptionEntity, array $data): Description
     {
         if (empty($data['lang']) || empty($data['name']) || empty($data['description'])) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $lang = strtolower($data['lang']);
         if (!in_array($lang, Description::LANGS)) {
-            throw new RequestDataException();
+            throw new BadRequestException();
         }
         $descriptionEntity->setLang($lang)->setName($data['name'])->setDescription($data['description']);
         $this->em->persist($descriptionEntity);

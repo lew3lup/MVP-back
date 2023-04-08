@@ -4,14 +4,14 @@ namespace App\Exception;
 
 use DomainException;
 
-class ForbiddenException extends DomainException
+class ConflictException extends DomainException
 {
     /**
-     * ForbiddenException constructor.
+     * ConflictException constructor.
      * @param string|null $message
      */
     public function __construct(?string $message = null)
     {
-        parent::__construct($message ?? 'FORBIDDEN', 403);
+        parent::__construct($message ?? 'CONFLICT', 409);
     }
 }

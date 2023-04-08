@@ -4,13 +4,13 @@ namespace App\Exception;
 
 use DomainException;
 
-class IncorrectEthAddressException extends DomainException
+class IncorrectEthAddressException extends BadRequestException
 {
     /**
      * IncorrectEthAddressException constructor.
      */
     public function __construct()
     {
-        parent::__construct('Incorrect address format', 400);
+        parent::__construct('INCORRECT_ADDRESS_FORMAT');
     }
 }

@@ -8,9 +8,10 @@ class NotFoundException extends DomainException
 {
     /**
      * NotFoundException constructor.
+     * @param string|null $message
      */
-    public function __construct()
+    public function __construct(?string $message = null)
     {
-        parent::__construct('Not found', 404);
+        parent::__construct($message ?? 'NOT_FOUND', 404);
     }
 }

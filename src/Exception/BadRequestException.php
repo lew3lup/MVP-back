@@ -4,14 +4,14 @@ namespace App\Exception;
 
 use DomainException;
 
-class EntityNotFoundException extends DomainException
+class BadRequestException extends DomainException
 {
     /**
-     * EntityNotFoundException constructor.
+     * RequestDataException constructor.
      * @param string|null $message
      */
     public function __construct(?string $message = null)
     {
-        parent::__construct($message ?? 'Not found', 404);
+        parent::__construct($message ?? 'BAD_REQUEST', 400);
     }
 }
