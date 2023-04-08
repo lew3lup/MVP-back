@@ -2,14 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Service\DescriptionService;
 use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
-use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,8 +56,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $game = $gameService->updateGame(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            $request->get('url'),
-            $request->get('active')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -88,9 +84,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addGameDescription(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            $request->get('lang'),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -119,8 +113,7 @@ class GameAdminController extends ApiController
                 $gameDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -171,7 +164,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $quest = $questService->addQuest(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            $request->get('type')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -197,8 +190,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $quest = $questService->updateQuest(
             $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
-            $request->get('type'),
-            $request->get('active')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -246,9 +238,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addQuestDescription(
             $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
-            $request->get('lang'),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -277,8 +267,7 @@ class GameAdminController extends ApiController
                 $questDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -354,7 +343,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $questTask = $questTaskService->updateQuestTask(
             $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
-            $request->get('active')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -402,9 +391,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addQuestTaskDescription(
             $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
-            $request->get('lang'),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([
@@ -433,8 +420,7 @@ class GameAdminController extends ApiController
                 $questTaskDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            $request->get('name'),
-            $request->get('description')
+            json_decode($request->getContent(), true)
         );
         $em->flush();
         return $this->json([

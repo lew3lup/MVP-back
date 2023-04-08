@@ -7,7 +7,6 @@ use App\Exception\ForbiddenException;
 use App\Exception\RequestDataException;
 use App\Repository\UserRepository;
 use App\Service\FractalService;
-use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Firebase\JWT\JWT;

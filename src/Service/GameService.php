@@ -37,15 +37,14 @@ class GameService
 
     /**
      * @param Game $game
-     * @param string $url
-     * @param bool $active
+     * @param array $data
      * @return Game
      */
-    public function updateGame(Game $game, string $url, bool $active): Game
+    public function updateGame(Game $game, array $data): Game
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (empty($data['url']) || !isset($data['active']) || !filter_var($data['url'], FILTER_VALIDATE_URL)) {
             throw new RequestDataException();
         }
-        return $game->setUrl($url)->setActive($active);
+        return $game->setUrl($data['url'])->setActive($data['active']);
     }
 }

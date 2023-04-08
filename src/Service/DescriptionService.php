@@ -90,108 +90,68 @@ class DescriptionService
 
     /**
      * @param Game $game
-     * @param string $lang
-     * @param string $name
-     * @param string $description
+     * @param array $data
      * @return GameDescription
      */
-    public function addGameDescription(
-        Game $game,
-        string $lang,
-        string $name,
-        string $description
-    ): GameDescription {
+    public function addGameDescription(Game $game, array $data): GameDescription
+    {
         /** @var GameDescription $description */
-        $description = $this->addDescription(
-            (new GameDescription())->setGame($game),
-            $lang,
-            $name,
-            $description
-        );
+        $description = $this->addDescription((new GameDescription())->setGame($game), $data);
         return $description;
     }
 
     /**
      * @param Quest $quest
-     * @param string $lang
-     * @param string $name
-     * @param string $description
+     * @param array $data
      * @return QuestDescription
      */
-    public function addQuestDescription(
-        Quest $quest,
-        string $lang,
-        string $name,
-        string $description
-    ): QuestDescription {
+    public function addQuestDescription(Quest $quest, array $data): QuestDescription
+    {
         /** @var QuestDescription $description */
-        $description = $this->addDescription(
-            (new QuestDescription())->setQuest($quest),
-            $lang,
-            $name,
-            $description
-        );
+        $description = $this->addDescription((new QuestDescription())->setQuest($quest), $data);
         return $description;
     }
 
     /**
      * @param QuestTask $questTask
-     * @param string $lang
-     * @param string $name
-     * @param string $description
+     * @param array $data
      * @return QuestTaskDescription
      */
-    public function addQuestTaskDescription(
-        QuestTask $questTask,
-        string $lang,
-        string $name,
-        string $description
-    ): QuestTaskDescription {
+    public function addQuestTaskDescription(QuestTask $questTask, array $data): QuestTaskDescription
+    {
         /** @var QuestTaskDescription $description */
-        $description = $this->addDescription(
-            (new QuestTaskDescription())->setQuestTask($questTask),
-            $lang,
-            $name,
-            $description
-        );
+        $description = $this->addDescription((new QuestTaskDescription())->setQuestTask($questTask), $data);
         return $description;
     }
 
     /**
      * @param Description $descriptionEntity
-     * @param string $name
-     * @param string $description
+     * @param array $data
      * @return Description
      */
-    public function updateDescription(
-        Description $descriptionEntity,
-        string $name,
-        string $description
-    ): Description {
-        if (!$name || !$description) {
+    public function updateDescription(Description $descriptionEntity, array $data): Description
+    {
+        if (empty($data['name']) || empty($data['description'])) {
             throw new RequestDataException();
         }
-        return $descriptionEntity->setName($name)->setDescription($description);
+        return $descriptionEntity->setName($data['name'])->setDescription($data['description']);
     }
 
     /**
      * @param Description $descriptionEntity
-     * @param string $lang
-     * @param string $name
-     * @param string $description
+     * @param array $data
      * @return Description
      */
-    private function addDescription(
-        Description $descriptionEntity,
-        string $lang,
-        string $name,
-        string $description
-    ): Description {
-        $lang = strtolower($lang);
-        if (!in_array($lang, Description::LANGS) || !$name || !$description) {
+    private function addDescription(Description $descriptionEntity, array $data): Description
+    {
+        if (empty($data['lang']) || empty($data['name']) || empty($data['description'])) {
             throw new RequestDataException();
         }
-        $descriptionEntity->setLang($lang)->setName($name)->setDescription($description);
+        $lang = strtolower($data['lang']);
+        if (!in_array($lang, Description::LANGS)) {
+            throw new RequestDataException();
+        }
+        $descriptionEntity->setLang($lang)->setName($data['name'])->setDescription($data['description']);
         $this->em->persist($descriptionEntity);
         return $descriptionEntity;
     }

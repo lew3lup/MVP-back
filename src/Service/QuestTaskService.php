@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Quest;
 use App\Entity\QuestTask;
 use App\Exception\NotFoundException;
+use App\Exception\RequestDataException;
 use App\Repository\QuestTaskRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,11 +55,14 @@ class QuestTaskService
 
     /**
      * @param QuestTask $questTask
-     * @param bool $active
+     * @param array $data
      * @return QuestTask
      */
-    public function updateQuestTask(QuestTask $questTask, bool $active): QuestTask
+    public function updateQuestTask(QuestTask $questTask, array $data): QuestTask
     {
-        return $questTask->setActive($active);
+        if (!isset($data['active'])) {
+            throw new RequestDataException();
+        }
+        return $questTask->setActive($data['active']);
     }
 }
