@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Exception\ConflictException;
 use App\Service\DescriptionService;
 use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,7 +88,11 @@ class GameAdminController extends ApiController
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
             json_decode($request->getContent(), true)
         );
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException();
+        }
         return $this->json([
             'type' => 'success',
             'data' => $description->jsonSerializeDetailed()
@@ -240,7 +246,11 @@ class GameAdminController extends ApiController
             $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
             json_decode($request->getContent(), true)
         );
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException();
+        }
         return $this->json([
             'type' => 'success',
             'data' => $description->jsonSerializeDetailed()
@@ -393,7 +403,11 @@ class GameAdminController extends ApiController
             $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
             json_decode($request->getContent(), true)
         );
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException();
+        }
         return $this->json([
             'type' => 'success',
             'data' => $description->jsonSerializeDetailed()

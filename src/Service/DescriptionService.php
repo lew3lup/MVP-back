@@ -149,7 +149,7 @@ class DescriptionService
         }
         $lang = strtolower($data['lang']);
         if (!in_array($lang, Description::LANGS)) {
-            throw new BadRequestException();
+            throw new BadRequestException('INVALID_LANGUAGE');
         }
         $descriptionEntity->setLang($lang)->setName($data['name'])->setDescription($data['description']);
         $this->em->persist($descriptionEntity);
