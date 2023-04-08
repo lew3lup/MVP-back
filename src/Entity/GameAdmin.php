@@ -30,7 +30,7 @@ class GameAdmin
     private $game;
     /**
      * @var User
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="adminedGames")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="admins")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;

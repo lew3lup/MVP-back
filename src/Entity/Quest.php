@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Quest
  * @package App\Entity
  */
-class Quest
+class Quest extends Descriptionable
 {
     /**
      * @var int
@@ -37,6 +38,26 @@ class Quest
      * @ORM\Column(type="integer")
      */
     private $type;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $active = true;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted = false;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="added_at")
+     */
+    private $addedAt;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="deleted_at", nullable=true)
+     */
+    private $deletedAt;
     /**
      * @var QuestDescription[]
      * @ORM\OneToMany(targetEntity="QuestDescription", mappedBy="quest")
@@ -108,11 +129,59 @@ class Quest
     }
 
     /**
-     * @return Collection|QuestDescription[]
+     * @return bool
      */
-    public function getDescriptions(): Collection
+    public function isActive(): bool
     {
-        return $this->descriptions;
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return Quest
+     */
+    public function setActive(bool $active): Quest
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return Quest
+     */
+    public function delete(): Quest
+    {
+        if (!$this->deleted) {
+            $this->deleted = true;
+            $this->deletedAt = new DateTimeImmutable();
+        }
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getAddedAt(): DateTimeImmutable
+    {
+        return $this->addedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $addedAt
+     * @return Quest
+     */
+    public function setAddedAt(DateTimeImmutable $addedAt): Quest
+    {
+        $this->addedAt = $addedAt;
+        return $this;
     }
 
     /**
@@ -121,5 +190,34 @@ class Quest
     public function getUserQuests(): Collection
     {
         return $this->userQuests;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'type'          => $this->type,
+            'descriptions'  => $this->descriptions->toArray(),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerializeDetailed(): array
+    {
+        $tasks = [];
+        foreach ($this->tasks as $task) {
+            if (!$task->isDeleted()) {
+                $tasks[] = $task->jsonSerializeDetailed();
+            }
+        }
+        return array_merge($this->jsonSerialize(), [
+            'active'    => $this->active,
+            'tasks'     => $tasks,
+        ]);
     }
 }

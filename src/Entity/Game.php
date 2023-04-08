@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Game
  * @package App\Entity
  */
-class Game
+class Game extends Descriptionable
 {
     /**
      * @var int
@@ -29,6 +30,26 @@ class Game
      * @ORM\Column(type="text")
      */
     private $url;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $active = true;
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted = false;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="added_at")
+     */
+    private $addedAt;
+    /**
+     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", name="deleted_at", nullable=true)
+     */
+    private $deletedAt;
     /**
      * @var GameDescription[]
      * @ORM\OneToMany(targetEntity="GameDescription", mappedBy="game")
@@ -82,11 +103,51 @@ class Game
     }
 
     /**
-     * @return Collection|GameDescription[]
+     * @return bool
      */
-    public function getDescriptions(): Collection
+    public function isActive(): bool
     {
-        return $this->descriptions;
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return Game
+     */
+    public function setActive(bool $active): Game
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return Game
+     */
+    public function delete(): Game
+    {
+        if (!$this->deleted) {
+            $this->deleted = true;
+            $this->deletedAt = new DateTimeImmutable();
+        }
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getAddedAt(): DateTimeImmutable
+    {
+        return $this->addedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $addedAt
+     * @return Game
+     */
+    public function setAddedAt(DateTimeImmutable $addedAt): Game
+    {
+        $this->addedAt = $addedAt;
+        return $this;
     }
 
     /**
@@ -103,5 +164,32 @@ class Game
     public function getAdmins(): Collection
     {
         return $this->admins;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'url'           => $this->url,
+            'active'        => $this->active,
+            'descriptions'  => $this->descriptions->toArray(),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerializeDetailed(): array
+    {
+        $quests = [];
+        foreach ($this->quests as $quest) {
+            if (!$quest->isDeleted()) {
+                $quests[] = $quest->jsonSerializeDetailed();
+            }
+        }
+        return array_merge($this->jsonSerialize(), ['quests' => $quests]);
     }
 }

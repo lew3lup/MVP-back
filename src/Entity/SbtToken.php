@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
 
 /**
  * Сущность SBT-токена
@@ -14,7 +13,7 @@ use JsonSerializable;
  * Class SbtToken
  * @package App\Entity
  */
-class SbtToken implements JsonSerializable
+class SbtToken extends Serializable
 {
     public const TYPE_LEW3LUP_ID = 1;
     public const TYPE_BABT = 2;

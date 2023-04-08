@@ -15,5 +15,28 @@ use Doctrine\ORM\EntityRepository;
  */
 class GameRepository extends EntityRepository
 {
-
+    /**
+     * @param int $id
+     * @param int $adminId
+     * @return Game|null
+     */
+    public function findOneByIdAndAdminId(int $id, int $adminId): ?Game
+    {
+        $result = $this->createQueryBuilder('g')
+            ->innerJoin('g.admins', 'ga')
+            ->innerJoin('ga.user', 'u')
+            ->where('g.id = :id')
+            ->andWhere('g.deleted = false')
+            ->andWhere('u.id = :adminId')
+            ->setParameter('id', $id)
+            ->setParameter('adminId', $adminId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+        if (!empty($result)) {
+            return $result[0];
+        }
+        return null;
+    }
 }

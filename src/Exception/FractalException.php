@@ -11,6 +11,6 @@ class FractalException extends DomainException
      */
     public function __construct()
     {
-        parent::__construct('Verification server unavailable', 503);
+        parent::__construct('VERIFICATION_SERVER_UNAVAILABLE', 503);
     }
 }

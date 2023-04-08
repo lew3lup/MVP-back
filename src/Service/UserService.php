@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Exception\ConflictException;
 use App\Exception\ForbiddenException;
 use App\Exception\IncorrectEthAddressException;
 use App\Exception\IncorrectSignatureException;
+use App\Exception\TokenExpiredException;
 use App\Exception\UnauthorizedException;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -97,12 +99,12 @@ class UserService
     public function linkMetamask(User $user, string $address, string $signature): void
     {
         if ($user->getAddress()) {
-            throw new ForbiddenException();
+            throw new ConflictException();
         }
         $address = strtolower($address);
         $this->checkSignature($address, $signature);
         if ($this->userRepo->findOneByAddress($address)) {
-            throw new ForbiddenException('Address already in use');
+            throw new ConflictException('ADDRESS_ALREADY_IN_USE');
         }
         $user->setAddress($address);
     }
@@ -194,11 +196,11 @@ class UserService
         try {
             $data = JWT::decode($token, new Key($secretKey, 'HS512'));
         } catch (Exception $e) {
-            throw new UnauthorizedException('Token expired');
+            throw new TokenExpiredException();
         }
         $now = new DateTimeImmutable();
         if ($data->nbf > $now->getTimestamp() || $data->exp < $now->getTimestamp()) {
-            throw new UnauthorizedException('Token expired');
+            throw new TokenExpiredException();
         }
         $user = $this->userRepo->findOneById($data->userId);
         if (!$user) {
@@ -245,7 +247,7 @@ class UserService
     {
         $secretKey = $this->parameterBag->get('jwtSecretKey');
         $issuedAt = new DateTimeImmutable();
-        $expireAt = $issuedAt->modify('+60 minutes');
+        $expireAt = $issuedAt->modify('+24 hours');
         $data = [
             'iat' => $issuedAt->getTimestamp(),
             'nbf' => $issuedAt->getTimestamp(),
