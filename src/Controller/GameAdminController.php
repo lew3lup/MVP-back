@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exception\BadRequestException;
 use App\Exception\ConflictException;
 use App\Service\DescriptionService;
 use App\Service\GameService;
@@ -58,7 +59,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $game = $gameService->updateGame(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -86,7 +87,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addGameDescription(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         try {
             $em->flush();
@@ -119,7 +120,7 @@ class GameAdminController extends ApiController
                 $gameDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -170,7 +171,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $quest = $questService->addQuest(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -196,7 +197,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $quest = $questService->updateQuest(
             $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -244,7 +245,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addQuestDescription(
             $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         try {
             $em->flush();
@@ -277,7 +278,7 @@ class GameAdminController extends ApiController
                 $questDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -353,7 +354,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $questTask = $questTaskService->updateQuestTask(
             $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -401,7 +402,7 @@ class GameAdminController extends ApiController
     ): JsonResponse {
         $description = $descriptionService->addQuestTaskDescription(
             $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         try {
             $em->flush();
@@ -434,7 +435,7 @@ class GameAdminController extends ApiController
                 $questTaskDescriptionId,
                 $this->getCurrentUser($request)->getId()
             ),
-            json_decode($request->getContent(), true)
+            $this->getRequestData($request)
         );
         $em->flush();
         return $this->json([
@@ -484,5 +485,18 @@ class GameAdminController extends ApiController
         $response = new Response();
         $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
         return $response;
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    private function getRequestData(Request $request): array
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            throw new BadRequestException();
+        }
+        return $data;
     }
 }
