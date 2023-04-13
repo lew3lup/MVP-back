@@ -55,6 +55,11 @@ class Game extends Descriptionable
      */
     private $telegram;
     /**
+     * @var string
+     * @ORM\Column(type="text", name="coin_market_cap", nullable=true)
+     */
+    private $coinMarketCap;
+    /**
      * @var bool
      * @ORM\Column(type="boolean")
      */
@@ -162,7 +167,7 @@ class Game extends Descriptionable
      * @param string $twitter
      * @return Game
      */
-    public function setTwitter(string $twitter): Game
+    public function setTwitter(?string $twitter): Game
     {
         $this->twitter = $twitter;
         return $this;
@@ -180,7 +185,7 @@ class Game extends Descriptionable
      * @param string $discord
      * @return Game
      */
-    public function setDiscord(string $discord): Game
+    public function setDiscord(?string $discord): Game
     {
         $this->discord = $discord;
         return $this;
@@ -198,9 +203,27 @@ class Game extends Descriptionable
      * @param string $telegram
      * @return Game
      */
-    public function setTelegram(string $telegram): Game
+    public function setTelegram(?string $telegram): Game
     {
         $this->telegram = $telegram;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCoinMarketCap(): string
+    {
+        return $this->coinMarketCap;
+    }
+
+    /**
+     * @param string $coinMarketCap
+     * @return Game
+     */
+    public function setCoinMarketCap(?string $coinMarketCap): Game
+    {
+        $this->coinMarketCap = $coinMarketCap;
         return $this;
     }
 

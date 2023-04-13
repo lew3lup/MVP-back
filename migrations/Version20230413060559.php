@@ -26,7 +26,8 @@ final class Version20230413060559 extends AbstractMigration
             ADD COLUMN path text not null,
             ADD COLUMN twitter text default null,
             ADD COLUMN discord text default null,
-            ADD COLUMN telegram text default null
+            ADD COLUMN telegram text default null,
+            ADD COLUMN coin_market_cap text default null
         ');
 
         //Category
@@ -64,7 +65,8 @@ final class Version20230413060559 extends AbstractMigration
             DROP COLUMN path,
             DROP COLUMN twitter,
             DROP COLUMN discord,
-            DROP COLUMN telegram
+            DROP COLUMN telegram,
+            DROP COLUMN coin_market_cap
         ');
         $this->addSql('ALTER TABLE games RENAME COLUMN home_page to url');
         $this->addSql('DROP TABLE games_categories');
