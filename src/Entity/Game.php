@@ -26,10 +26,34 @@ class Game extends Descriptionable
      */
     private $id;
     /**
+     * SEO URL на нашем сайте
+     *
      * @var string
      * @ORM\Column(type="text")
      */
-    private $url;
+    private $path;
+    /**
+     * Сайт игры
+     *
+     * @var string
+     * @ORM\Column(type="text", name="home_page")
+     */
+    private $homePage;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $twitter;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $discord;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $telegram;
     /**
      * @var bool
      * @ORM\Column(type="boolean")
@@ -65,6 +89,11 @@ class Game extends Descriptionable
      * @ORM\OneToMany(targetEntity="GameAdmin", mappedBy="game")
      */
     private $admins;
+    /**
+     * @var GameCategory[]
+     * @ORM\OneToMany(targetEntity="GameCategory", mappedBy="game")
+     */
+    private $gameCategories;
 
     /**
      * Game constructor.
@@ -74,6 +103,7 @@ class Game extends Descriptionable
         $this->descriptions = new ArrayCollection();
         $this->quests = new ArrayCollection();
         $this->admins = new ArrayCollection();
+        $this->gameCategories = new ArrayCollection();
     }
 
     /**
@@ -87,18 +117,90 @@ class Game extends Descriptionable
     /**
      * @return string
      */
-    public function getUrl(): string
+    public function getPath(): string
     {
-        return $this->url;
+        return $this->path;
     }
 
     /**
-     * @param string $url
+     * @param string $path
      * @return Game
      */
-    public function setUrl(string $url): Game
+    public function setPath(string $path): Game
     {
-        $this->url = $url;
+        $this->path = $path;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHomePage(): string
+    {
+        return $this->homePage;
+    }
+
+    /**
+     * @param string $homePage
+     * @return Game
+     */
+    public function setHomePage(string $homePage): Game
+    {
+        $this->homePage = $homePage;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTwitter(): ?string
+    {
+        return $this->twitter;
+    }
+
+    /**
+     * @param string $twitter
+     * @return Game
+     */
+    public function setTwitter(string $twitter): Game
+    {
+        $this->twitter = $twitter;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiscord(): ?string
+    {
+        return $this->discord;
+    }
+
+    /**
+     * @param string $discord
+     * @return Game
+     */
+    public function setDiscord(string $discord): Game
+    {
+        $this->discord = $discord;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTelegram(): ?string
+    {
+        return $this->telegram;
+    }
+
+    /**
+     * @param string $telegram
+     * @return Game
+     */
+    public function setTelegram(string $telegram): Game
+    {
+        $this->telegram = $telegram;
         return $this;
     }
 
@@ -167,15 +269,32 @@ class Game extends Descriptionable
     }
 
     /**
+     * @return Collection|GameCategory[]
+     */
+    public function getGameCategories(): Collection
+    {
+        return $this->gameCategories;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
     {
+        $categories = [];
+        foreach ($this->gameCategories as $gameCategory) {
+            $categories[] = $gameCategory->getCategory();
+        }
         return [
             'id'            => $this->id,
-            'url'           => $this->url,
+            'path'          => $this->path,
+            'homePage'      => $this->homePage,
+            'twitter'       => $this->twitter,
+            'discord'       => $this->discord,
+            'telegram'      => $this->telegram,
             'active'        => $this->active,
             'descriptions'  => $this->descriptions->toArray(),
+            'categories'    => $categories,
         ];
     }
 

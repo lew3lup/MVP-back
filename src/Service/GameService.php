@@ -45,6 +45,6 @@ class GameService
         if (empty($data['url']) || !isset($data['active']) || !filter_var($data['url'], FILTER_VALIDATE_URL)) {
             throw new BadRequestException();
         }
-        return $game->setUrl($data['url'])->setActive($data['active']);
+        return $game->setHomePage($data['url'])->setActive($data['active']);
     }
 }
