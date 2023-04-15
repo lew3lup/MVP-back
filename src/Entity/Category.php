@@ -22,19 +22,6 @@ class Category extends Descriptionable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var CategoryDescription[]
-     * @ORM\OneToMany(targetEntity="CategoryDescription", mappedBy="quest")
-     */
-    private $descriptions;
-
-    /**
-     * Category constructor.
-     */
-    public function __construct()
-    {
-        $this->descriptions = new ArrayCollection();
-    }
 
     /**
      * @return array
@@ -43,7 +30,8 @@ class Category extends Descriptionable
     {
         return [
             'id'            => $this->id,
-            'descriptions'  => $this->descriptions->toArray(),
+            'name'          => $this->name,
+            'description'   => $this->description,
         ];
     }
 }

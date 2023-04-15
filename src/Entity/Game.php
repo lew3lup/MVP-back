@@ -80,11 +80,6 @@ class Game extends Descriptionable
      */
     private $deletedAt;
     /**
-     * @var GameDescription[]
-     * @ORM\OneToMany(targetEntity="GameDescription", mappedBy="game")
-     */
-    private $descriptions;
-    /**
      * @var Quest[]
      * @ORM\OneToMany(targetEntity="Quest", mappedBy="game")
      */
@@ -105,7 +100,6 @@ class Game extends Descriptionable
      */
     public function __construct()
     {
-        $this->descriptions = new ArrayCollection();
         $this->quests = new ArrayCollection();
         $this->admins = new ArrayCollection();
         $this->gameCategories = new ArrayCollection();
@@ -316,7 +310,8 @@ class Game extends Descriptionable
             'discord'       => $this->discord,
             'telegram'      => $this->telegram,
             'active'        => $this->active,
-            'descriptions'  => $this->descriptions->toArray(),
+            'name'          => $this->name,
+            'description'   => $this->description,
             'categories'    => $categories,
         ];
     }

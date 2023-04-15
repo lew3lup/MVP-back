@@ -19,6 +19,18 @@ final class Version20230413060559 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        //GameDescription
+        $this->addSql('DROP TABLE games_descriptions');
+
+        //AchievementDescription
+        $this->addSql('DROP TABLE achievements_descriptions');
+
+        //QuestDescription
+        $this->addSql('DROP TABLE quests_descriptions');
+
+        //QuestTaskDescription
+        $this->addSql('DROP TABLE quests_tasks_descriptions');
+
         //Game
         $this->addSql('TRUNCATE TABLE games CASCADE');
         $this->addSql('ALTER TABLE games RENAME COLUMN url to home_page');
@@ -27,12 +39,35 @@ final class Version20230413060559 extends AbstractMigration
             ADD COLUMN twitter text default null,
             ADD COLUMN discord text default null,
             ADD COLUMN telegram text default null,
-            ADD COLUMN coin_market_cap text default null
+            ADD COLUMN coin_market_cap text default null,
+            ADD COLUMN name json not null,
+            ADD COLUMN description json not null,
+            ADD UNIQUE (path)
+        ');
+
+        //Achievement
+        $this->addSql('ALTER TABLE achievements
+            ADD COLUMN name json not null,
+            ADD COLUMN description json not null
+        ');
+
+        //Quest
+        $this->addSql('ALTER TABLE quests
+            ADD COLUMN name json not null,
+            ADD COLUMN description json not null
+        ');
+
+        //QuestTask
+        $this->addSql('ALTER TABLE quests_tasks
+            ADD COLUMN name json not null,
+            ADD COLUMN description json not null
         ');
 
         //Category
         $this->addSql('CREATE TABLE categories (
             id serial not null,
+            name json not null,
+            description json not null,
             PRIMARY KEY (id)
         )');
 
@@ -45,18 +80,6 @@ final class Version20230413060559 extends AbstractMigration
             FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
             FOREIGN KEY (category_id) REFERENCES categories ON DELETE CASCADE
         )');
-
-        //CategoryDescription
-        $this->addSql('CREATE TABLE categories_descriptions (
-            id serial not null,
-            lang char(2) not null,
-            name text not null,
-            description text not null,
-            category_id integer not null,
-            PRIMARY KEY (id),
-            FOREIGN KEY (category_id) REFERENCES categories ON DELETE CASCADE,
-            UNIQUE (lang, category_id)
-        )');
     }
 
     public function down(Schema $schema): void
@@ -66,11 +89,64 @@ final class Version20230413060559 extends AbstractMigration
             DROP COLUMN twitter,
             DROP COLUMN discord,
             DROP COLUMN telegram,
-            DROP COLUMN coin_market_cap
+            DROP COLUMN coin_market_cap,
+            DROP COLUMN name,
+            DROP COLUMN description
         ');
         $this->addSql('ALTER TABLE games RENAME COLUMN home_page to url');
+        $this->addSql('ALTER TABLE achievements
+            DROP COLUMN name,
+            DROP COLUMN description
+        ');
+        $this->addSql('ALTER TABLE quests
+            DROP COLUMN name,
+            DROP COLUMN description
+        ');
+        $this->addSql('ALTER TABLE quests_tasks
+            DROP COLUMN name,
+            DROP COLUMN description
+        ');
         $this->addSql('DROP TABLE games_categories');
-        $this->addSql('DROP TABLE categories_descriptions');
         $this->addSql('DROP TABLE categories');
+        $this->addSql('CREATE TABLE games_descriptions (
+            id serial not null,
+            lang char(2) not null,
+            name text not null,
+            description text not null,
+            game_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
+            UNIQUE (lang, game_id)
+        )');
+        $this->addSql('CREATE TABLE achievements_descriptions (
+            id serial not null,
+            lang char(2) not null,
+            name text not null,
+            description text not null,
+            achievement_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (achievement_id) REFERENCES achievements ON DELETE CASCADE,
+            UNIQUE (lang, achievement_id)
+        )');
+        $this->addSql('CREATE TABLE quests_descriptions (
+            id serial not null,
+            lang char(2) not null,
+            name text not null,
+            description text not null,
+            quest_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (quest_id) REFERENCES quests ON DELETE CASCADE,
+            UNIQUE (lang, quest_id)
+        )');
+        $this->addSql('CREATE TABLE quests_tasks_descriptions (
+            id serial not null,
+            lang char(2) not null,
+            name text not null,
+            description text not null,
+            quest_task_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (quest_task_id) REFERENCES quests ON DELETE CASCADE,
+            UNIQUE (lang, quest_task_id)
+        )');
     }
 }

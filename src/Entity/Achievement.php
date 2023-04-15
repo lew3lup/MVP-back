@@ -25,11 +25,6 @@ class Achievement extends Descriptionable
      */
     private $id;
     /**
-     * @var AchievementDescription[]
-     * @ORM\OneToMany(targetEntity="AchievementDescription", mappedBy="achievement")
-     */
-    private $descriptions;
-    /**
      * @var UserAchievement[]
      * @ORM\OneToMany(targetEntity="UserAchievement", mappedBy="achievement")
      */
@@ -40,7 +35,6 @@ class Achievement extends Descriptionable
      */
     public function __construct()
     {
-        $this->descriptions = new ArrayCollection();
         $this->userAchievements = new ArrayCollection();
     }
 
@@ -67,7 +61,8 @@ class Achievement extends Descriptionable
     {
         return [
             'id'            => $this->id,
-            'descriptions'  => $this->descriptions->toArray(),
+            'name'          => $this->name,
+            'description'   => $this->description,
         ];
     }
 }

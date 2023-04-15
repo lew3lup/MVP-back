@@ -6,11 +6,6 @@ services:
 
   App\Service\Doctrine\RepositoryFactory: ~
 
-  App\Repository\AchievementDescriptionRepository:
-    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
-    lazy: true
-    arguments:
-      - 'App\Entity\AchievementDescription'
   App\Repository\AchievementRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
@@ -31,11 +26,6 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\GameAdmin'
-  App\Repository\GameDescriptionRepository:
-    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
-    lazy: true
-    arguments:
-      - 'App\Entity\GameDescription'
   App\Repository\GameRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
@@ -46,21 +36,11 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\LastParsedBlock'
-  App\Repository\QuestDescriptionRepository:
-    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
-    lazy: true
-    arguments:
-      - 'App\Entity\QuestDescription'
   App\Repository\QuestRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true
     arguments:
       - 'App\Entity\Quest'
-  App\Repository\QuestTaskDescriptionRepository:
-    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
-    lazy: true
-    arguments:
-      - 'App\Entity\QuestTaskDescription'
   App\Repository\QuestTaskRepository:
     factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
     lazy: true

@@ -15,16 +15,23 @@ class GameService
     private $em;
     /** @var GameRepository */
     private $gameRepo;
+    /** @var DescriptionService */
+    private $descriptionService;
 
     /**
      * GameService constructor.
      * @param EntityManagerInterface $em
      * @param GameRepository $gameRepo
+     * @param DescriptionService $descriptionService
      */
-    public function __construct(EntityManagerInterface $em, GameRepository $gameRepo)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        GameRepository $gameRepo,
+        DescriptionService $descriptionService
+    ) {
         $this->em = $em;
         $this->gameRepo = $gameRepo;
+        $this->descriptionService = $descriptionService;
     }
 
     /**
@@ -85,6 +92,7 @@ class GameService
         ) {
             throw new BadRequestException();
         }
+        $this->descriptionService->setData($game, $data);
         return $game
             ->setPath($data['path'])
             ->setHomePage($data['homePage'])
