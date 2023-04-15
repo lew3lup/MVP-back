@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Game;
+use App\Entity\GameAdmin;
+use App\Entity\User;
 use App\Exception\NotFoundException;
 use App\Exception\BadRequestException;
 use App\Repository\GameRepository;
@@ -49,14 +51,16 @@ class GameService
     }
 
     /**
-     * @param Game $game
+     * @param User $user
      * @param array $data
      * @return Game
      */
-    public function addGame(Game $game, array $data): Game
+    public function addGame(User $user, array $data): Game
     {
-        $game = $this->setData($game, $data)->setAddedAt(new DateTimeImmutable());
+        $game = $this->setData(new Game(), $data)->setAddedAt(new DateTimeImmutable());
+        $gameAdmin = (new GameAdmin())->setGame($game)->setUser($user);
         $this->em->persist($game);
+        $this->em->persist($gameAdmin);
         return $game;
     }
 

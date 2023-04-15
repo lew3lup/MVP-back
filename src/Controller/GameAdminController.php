@@ -3,13 +3,10 @@
 namespace App\Controller;
 
 use App\Exception\BadRequestException;
-use App\Exception\ConflictException;
-use App\Service\DescriptionService;
 use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +19,27 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GameAdminController extends ApiController
 {
+    /**
+     * @Route("add-game", methods={"POST"})
+     *
+     * @param Request $request
+     * @param GameService $gameService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function addGame(
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $game = $gameService->addGame($this->getCurrentUser($request), $this->getRequestData($request));
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
     /**
      * @Route("game/{gameId}", methods={"GET"})
      *
@@ -216,6 +234,7 @@ class GameAdminController extends ApiController
     }
 
     /**
+     * @Route("add-game", methods={"OPTIONS"})
      * @Route("game/{gameId}", methods={"OPTIONS"})
      * @Route("game/{gameId}/add-quest", methods={"OPTIONS"})
      * @Route("quest/{questId}", methods={"OPTIONS"})
