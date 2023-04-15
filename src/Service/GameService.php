@@ -71,10 +71,7 @@ class GameService
      */
     public function updateGame(Game $game, array $data): Game
     {
-        if (!isset($data['active'])) {
-            throw new BadRequestException();
-        }
-        return $this->setData($game, $data)->setActive($data['active']);
+        return $this->setData($game, $data);
     }
 
     /**

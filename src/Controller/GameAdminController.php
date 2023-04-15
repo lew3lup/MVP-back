@@ -85,7 +85,11 @@ class GameAdminController extends ApiController
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
             $this->getRequestData($request)
         );
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException('PATH_IS_ALREADY_IN_USE');
+        }
         return $this->json([
             'type' => 'success',
             'data' => $game->jsonSerializeDetailed()
