@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Exception\BadRequestException;
+use App\Exception\ConflictException;
 use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +35,11 @@ class GameAdminController extends ApiController
         EntityManagerInterface $em
     ): JsonResponse {
         $game = $gameService->addGame($this->getCurrentUser($request), $this->getRequestData($request));
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException('PATH_IS_ALREADY_IN_USE');
+        }
         return $this->json([
             'type' => 'success',
             'data' => $game->jsonSerializeDetailed()

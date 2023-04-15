@@ -84,16 +84,38 @@ class GameService
      */
     private function setData(Game $game, array $data): Game
     {
-        //ToDo: детальные проверки ссылок
-        if (
-            empty($data['homePage']) || !filter_var($data['url'], FILTER_VALIDATE_URL) ||
-            empty($data['path']) || strlen($data['path']) > 30 ||
-            (!empty($data['twitter']) && !filter_var($data['twitter'], FILTER_VALIDATE_URL)) ||
-            (!empty($data['discord']) && !filter_var($data['discord'], FILTER_VALIDATE_URL)) ||
-            (!empty($data['telegram']) && !filter_var($data['telegram'], FILTER_VALIDATE_URL)) ||
-            (!empty($data['coinMarketCap']) && !filter_var($data['coinMarketCap'], FILTER_VALIDATE_URL)) ||
-            !isset($data['active'])
-        ) {
+        //ToDo: категории, Supported Chains, Backers, логотип и скриншоты
+
+        //ToDo: дополнительная валидация path
+        if (empty($data['path']) || strlen($data['path']) > 30) {
+            throw new BadRequestException('INVALID_PATH');
+        }
+        if (empty($data['homePage']) || !filter_var($data['homePage'], FILTER_VALIDATE_URL)) {
+            throw new BadRequestException('INVALID_HOME_PAGE');
+        }
+        if (!empty($data['twitter']) && (
+            !filter_var($data['twitter'], FILTER_VALIDATE_URL) ||
+            strpos($data['twitter'], 'https://twitter.com/') !== 0
+        )) {
+            throw new BadRequestException('INVALID_TWITTER_LINK');
+        }
+        //ToDo: возможно, нужна дополнительная валидация ссылки на дискорд
+        if (!empty($data['discord']) && !filter_var($data['discord'], FILTER_VALIDATE_URL)) {
+            throw new BadRequestException('INVALID_DISCORD_LINK');
+        }
+        if (!empty($data['telegram']) && (
+            !filter_var($data['telegram'], FILTER_VALIDATE_URL) ||
+            strpos($data['telegram'], 'https://t.me/') !== 0
+        )) {
+            throw new BadRequestException('INVALID_TELEGRAM_LINK');
+        }
+        if (!empty($data['coinMarketCap']) && (
+            !filter_var($data['coinMarketCap'], FILTER_VALIDATE_URL) ||
+            strpos($data['coinMarketCap'], 'https://coinmarketcap.com/currencies/')
+        )) {
+            throw new BadRequestException('INVALID_COIN_MARKET_CAP_LINK');
+        }
+        if (!isset($data['active'])) {
             throw new BadRequestException();
         }
         $this->descriptionService->setData($game, $data);
