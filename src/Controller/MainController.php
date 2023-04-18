@@ -91,8 +91,7 @@ class MainController extends ApiController
         EntityManagerInterface $em,
         LoggerInterface $logger
     ): RedirectResponse {
-        //ToDo: поменять адрес редиректа, когда он будет известен
-        $url = $parameterBag->get('frontDomain');
+        $url = $parameterBag->get('frontDomain') . '/google';
         try {
             if ($request->get('code')) {
                 [$user, $token] = $this->userService->googleLogin($request->get('code'));
