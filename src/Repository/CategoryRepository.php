@@ -15,5 +15,12 @@ use Doctrine\ORM\EntityRepository;
  */
 class CategoryRepository extends EntityRepository
 {
-
+    /**
+     * @param int[] $ids
+     * @return Category[]
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->findBy(['id' => $ids]);
+    }
 }

@@ -4,9 +4,11 @@ namespace App\Service;
 
 use App\Entity\Game;
 use App\Entity\GameAdmin;
+use App\Entity\GameCategory;
 use App\Entity\User;
 use App\Exception\NotFoundException;
 use App\Exception\BadRequestException;
+use App\Repository\CategoryRepository;
 use App\Repository\GameRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +19,8 @@ class GameService
     private $em;
     /** @var GameRepository */
     private $gameRepo;
+    /** @var CategoryRepository */
+    private $categoryRepo;
     /** @var DescriptionService */
     private $descriptionService;
 
@@ -24,15 +28,18 @@ class GameService
      * GameService constructor.
      * @param EntityManagerInterface $em
      * @param GameRepository $gameRepo
+     * @param CategoryRepository $categoryRepo
      * @param DescriptionService $descriptionService
      */
     public function __construct(
         EntityManagerInterface $em,
         GameRepository $gameRepo,
+        CategoryRepository $categoryRepo,
         DescriptionService $descriptionService
     ) {
         $this->em = $em;
         $this->gameRepo = $gameRepo;
+        $this->categoryRepo = $categoryRepo;
         $this->descriptionService = $descriptionService;
     }
 
@@ -71,6 +78,9 @@ class GameService
      */
     public function updateGame(Game $game, array $data): Game
     {
+        foreach ($game->getGameCategories() as $gameCategory) {
+            $this->em->remove($gameCategory);
+        }
         return $this->setData($game, $data);
     }
 
@@ -81,7 +91,7 @@ class GameService
      */
     private function setData(Game $game, array $data): Game
     {
-        //ToDo: категории, Supported Chains, Backers, логотип и скриншоты
+        //ToDo: Supported Chains, Backers, логотип и скриншоты
 
         //ToDo: дополнительная валидация path
         if (empty($data['path']) || strlen($data['path']) > 30) {
@@ -112,10 +122,17 @@ class GameService
         )) {
             throw new BadRequestException('INVALID_COIN_MARKET_CAP_LINK');
         }
-        if (!isset($data['active'])) {
+        if (!isset($data['active']) || !isset($data['categories']) || !is_array($data['categories'])) {
             throw new BadRequestException();
         }
         $this->descriptionService->setData($game, $data);
+        $categories = $this->categoryRepo->findByIds($data['categories']);
+        foreach ($categories as $category) {
+            $gameCategory = (new GameCategory())
+                ->setGame($game)
+                ->setCategory($category);
+            $this->em->persist($gameCategory);
+        }
         return $game
             ->setPath($data['path'])
             ->setHomePage($data['homePage'])

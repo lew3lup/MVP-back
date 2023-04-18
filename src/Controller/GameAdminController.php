@@ -8,6 +8,7 @@ use App\Service\GameService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
+use DomainException;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,10 +35,16 @@ class GameAdminController extends ApiController
         GameService $gameService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $game = $gameService->addGame($this->getCurrentUser($request), $this->getRequestData($request));
+        $em->beginTransaction();
         try {
+            $game = $gameService->addGame($this->getCurrentUser($request), $this->getRequestData($request));
             $em->flush();
+            $em->commit();
+        } catch (DomainException $e) {
+            $em->rollback();
+            throw $e;
         } catch (Exception $e) {
+            $em->rollback();
             throw new ConflictException('PATH_IS_ALREADY_IN_USE');
         }
         return $this->json([
@@ -254,7 +261,7 @@ class GameAdminController extends ApiController
     public function options(): Response
     {
         $response = new Response();
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE');
         return $response;
     }
 
