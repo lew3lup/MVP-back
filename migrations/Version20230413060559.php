@@ -80,6 +80,41 @@ final class Version20230413060559 extends AbstractMigration
             FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
             FOREIGN KEY (category_id) REFERENCES categories ON DELETE CASCADE
         )');
+
+        //Chain
+        $this->addSql('CREATE TABLE chains (
+            id serial not null,
+            name text not null,
+            short_name text default null,
+            PRIMARY KEY (id)
+        )');
+
+        //GameChain
+        $this->addSql('CREATE TABLE games_chains (
+            id serial not null,
+            game_id integer not null,
+            chain_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
+            FOREIGN KEY (chain_id) REFERENCES chains ON DELETE CASCADE
+        )');
+
+        //Backer
+        $this->addSql('CREATE TABLE backers (
+            id serial not null,
+            name text not null,
+            PRIMARY KEY (id)
+        )');
+
+        //GameBacker
+        $this->addSql('CREATE TABLE games_backers (
+            id serial not null,
+            game_id integer not null,
+            backer_id integer not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
+            FOREIGN KEY (backer_id) REFERENCES backers ON DELETE CASCADE
+        )');
     }
 
     public function down(Schema $schema): void
@@ -108,6 +143,10 @@ final class Version20230413060559 extends AbstractMigration
         ');
         $this->addSql('DROP TABLE games_categories');
         $this->addSql('DROP TABLE categories');
+        $this->addSql('DROP TABLE games_chains');
+        $this->addSql('DROP TABLE chains');
+        $this->addSql('DROP TABLE games_backers');
+        $this->addSql('DROP TABLE backers');
         $this->addSql('CREATE TABLE games_descriptions (
             id serial not null,
             lang char(2) not null,

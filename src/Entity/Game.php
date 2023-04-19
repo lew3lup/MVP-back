@@ -94,6 +94,16 @@ class Game extends Descriptionable
      * @ORM\OneToMany(targetEntity="GameCategory", mappedBy="game")
      */
     private $gameCategories;
+    /**
+     * @var GameChain[]
+     * @ORM\OneToMany(targetEntity="GameChain", mappedBy="game")
+     */
+    private $gameChains;
+    /**
+     * @var GameBacker[]
+     * @ORM\OneToMany(targetEntity="GameBacker", mappedBy="game")
+     */
+    private $gameBackers;
 
     /**
      * Game constructor.
@@ -103,6 +113,8 @@ class Game extends Descriptionable
         $this->quests = new ArrayCollection();
         $this->admins = new ArrayCollection();
         $this->gameCategories = new ArrayCollection();
+        $this->gameChains = new ArrayCollection();
+        $this->gameBackers = new ArrayCollection();
     }
 
     /**
@@ -294,6 +306,22 @@ class Game extends Descriptionable
     }
 
     /**
+     * @return Collection|GameChain[]
+     */
+    public function getGameChains(): Collection
+    {
+        return $this->gameChains;
+    }
+
+    /**
+     * @return Collection|GameBacker[]
+     */
+    public function getGameBackers(): Collection
+    {
+        return $this->gameBackers;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
@@ -301,6 +329,14 @@ class Game extends Descriptionable
         $categories = [];
         foreach ($this->gameCategories as $gameCategory) {
             $categories[] = $gameCategory->getCategory();
+        }
+        $chains = [];
+        foreach ($this->gameChains as $gameChain) {
+            $chains[] = $gameChain->getChain();
+        }
+        $backers = [];
+        foreach ($this->gameBackers as $gameBacker) {
+            $backers[] = $gameBacker->getBacker();
         }
         return [
             'id'            => $this->id,
@@ -313,6 +349,8 @@ class Game extends Descriptionable
             'name'          => $this->name,
             'description'   => $this->description,
             'categories'    => $categories,
+            'chains'        => $chains,
+            'backers'       => $backers,
         ];
     }
 
