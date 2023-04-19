@@ -5,10 +5,13 @@ namespace App\Service;
 use App\Entity\Game;
 use App\Entity\GameAdmin;
 use App\Entity\GameCategory;
+use App\Entity\GameChain;
 use App\Entity\User;
 use App\Exception\NotFoundException;
 use App\Exception\BadRequestException;
+use App\Repository\BackerRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ChainRepository;
 use App\Repository\GameRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +24,10 @@ class GameService
     private $gameRepo;
     /** @var CategoryRepository */
     private $categoryRepo;
+    /** @var ChainRepository */
+    private $chainRepo;
+    /** @var BackerRepository */
+    private $backerRepo;
     /** @var DescriptionService */
     private $descriptionService;
 
@@ -29,17 +36,23 @@ class GameService
      * @param EntityManagerInterface $em
      * @param GameRepository $gameRepo
      * @param CategoryRepository $categoryRepo
+     * @param ChainRepository $chainRepo
+     * @param BackerRepository $backerRepo
      * @param DescriptionService $descriptionService
      */
     public function __construct(
         EntityManagerInterface $em,
         GameRepository $gameRepo,
         CategoryRepository $categoryRepo,
+        ChainRepository $chainRepo,
+        BackerRepository $backerRepo,
         DescriptionService $descriptionService
     ) {
         $this->em = $em;
         $this->gameRepo = $gameRepo;
         $this->categoryRepo = $categoryRepo;
+        $this->chainRepo = $chainRepo;
+        $this->backerRepo = $backerRepo;
         $this->descriptionService = $descriptionService;
     }
 
@@ -91,7 +104,7 @@ class GameService
      */
     private function setData(Game $game, array $data): Game
     {
-        //ToDo: Supported Chains, Backers, логотип и скриншоты
+        //ToDo: Backers, логотип и скриншоты
 
         //ToDo: дополнительная валидация path
         if (empty($data['path']) || strlen($data['path']) > 30) {
@@ -132,6 +145,13 @@ class GameService
                 ->setGame($game)
                 ->setCategory($category);
             $this->em->persist($gameCategory);
+        }
+        $chains = $this->chainRepo->findByIds($data['chains']);
+        foreach ($chains as $chain) {
+            $gameChain = (new GameChain())
+                ->setGame($game)
+                ->setChain($chain);
+            $this->em->persist($gameChain);
         }
         return $game
             ->setPath($data['path'])

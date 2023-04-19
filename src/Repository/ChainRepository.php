@@ -15,5 +15,12 @@ use Doctrine\ORM\EntityRepository;
  */
 class ChainRepository extends EntityRepository
 {
-
+    /**
+     * @param array $ids
+     * @return Chain[]|array
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->findBy(['id' => $ids]);
+    }
 }
