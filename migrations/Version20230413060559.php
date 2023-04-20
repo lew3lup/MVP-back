@@ -35,11 +35,13 @@ final class Version20230413060559 extends AbstractMigration
         $this->addSql('TRUNCATE TABLE games CASCADE');
         $this->addSql('ALTER TABLE games RENAME COLUMN url to home_page');
         $this->addSql('ALTER TABLE games
+            ADD COLUMN logo text default null,
             ADD COLUMN path text not null,
             ADD COLUMN twitter text default null,
             ADD COLUMN discord text default null,
             ADD COLUMN telegram text default null,
             ADD COLUMN coin_market_cap text default null,
+            ADD COLUMN images json default null,
             ADD COLUMN name json not null,
             ADD COLUMN description json not null,
             ADD UNIQUE (path)
@@ -120,11 +122,13 @@ final class Version20230413060559 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->addSql('ALTER TABLE games
+            DROP COLUMN logo,
             DROP COLUMN path,
             DROP COLUMN twitter,
             DROP COLUMN discord,
             DROP COLUMN telegram,
             DROP COLUMN coin_market_cap,
+            DROP COLUMN images,
             DROP COLUMN name,
             DROP COLUMN description
         ');

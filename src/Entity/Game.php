@@ -26,6 +26,11 @@ class Game extends Descriptionable
      */
     private $id;
     /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $logo;
+    /**
      * SEO URL на нашем сайте
      *
      * @var string
@@ -80,6 +85,11 @@ class Game extends Descriptionable
      */
     private $deletedAt;
     /**
+     * @var string[]
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $images;
+    /**
      * @var Quest[]
      * @ORM\OneToMany(targetEntity="Quest", mappedBy="game")
      */
@@ -123,6 +133,24 @@ class Game extends Descriptionable
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    /**
+     * @param string $logo
+     * @return Game
+     */
+    public function setLogo(?string $logo): Game
+    {
+        $this->logo = $logo;
+        return $this;
     }
 
     /**
@@ -282,6 +310,27 @@ class Game extends Descriptionable
     }
 
     /**
+     * @return string[]
+     */
+    public function getImages(): array
+    {
+        return $this->images ?? [];
+    }
+
+    /**
+     * @param string $image
+     * @return Game
+     */
+    public function addImage(string $image): Game
+    {
+        if ($this->images === null) {
+            $this->images = [];
+        }
+        $this->images[] = $image;
+        return $this;
+    }
+
+    /**
      * @return Collection|Quest[]
      */
     public function getQuests(): Collection
@@ -340,6 +389,7 @@ class Game extends Descriptionable
         }
         return [
             'id'            => $this->id,
+            'logo'          => $this->logo,
             'path'          => $this->path,
             'homePage'      => $this->homePage,
             'twitter'       => $this->twitter,
@@ -348,6 +398,7 @@ class Game extends Descriptionable
             'active'        => $this->active,
             'name'          => $this->name,
             'description'   => $this->description,
+            'images'        => $this->getImages(),
             'categories'    => $categories,
             'chains'        => $chains,
             'backers'       => $backers,
