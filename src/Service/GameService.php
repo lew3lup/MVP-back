@@ -30,6 +30,8 @@ class GameService
     private $backerRepo;
     /** @var DescriptionService */
     private $descriptionService;
+    /** @var ImageService */
+    private $imageService;
 
     /**
      * GameService constructor.
@@ -39,6 +41,7 @@ class GameService
      * @param ChainRepository $chainRepo
      * @param BackerRepository $backerRepo
      * @param DescriptionService $descriptionService
+     * @param ImageService $imageService
      */
     public function __construct(
         EntityManagerInterface $em,
@@ -46,7 +49,8 @@ class GameService
         CategoryRepository $categoryRepo,
         ChainRepository $chainRepo,
         BackerRepository $backerRepo,
-        DescriptionService $descriptionService
+        DescriptionService $descriptionService,
+        ImageService $imageService
     ) {
         $this->em = $em;
         $this->gameRepo = $gameRepo;
@@ -54,6 +58,7 @@ class GameService
         $this->chainRepo = $chainRepo;
         $this->backerRepo = $backerRepo;
         $this->descriptionService = $descriptionService;
+        $this->imageService = $imageService;
     }
 
     /**
@@ -97,6 +102,13 @@ class GameService
         return $this->setData($game, $data);
     }
 
+    public function setGameLogo(Game $game, $logo): Game
+    {
+        $path = '';//ToDo
+        $this->imageService->saveImage($path, $logo);
+        return $game->setLogo($path);
+    }
+
     /**
      * @param Game $game
      * @param array $data
@@ -104,7 +116,7 @@ class GameService
      */
     private function setData(Game $game, array $data): Game
     {
-        //ToDo: Backers, логотип и скриншоты
+        //ToDo: Backers
 
         //ToDo: дополнительная валидация path
         if (empty($data['path']) || strlen($data['path']) > 30) {

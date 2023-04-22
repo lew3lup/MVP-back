@@ -103,6 +103,23 @@ class GameAdminController extends ApiController
         ]);
     }
 
+    public function setGameLogo(
+        int $gameId,
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $game = $gameService->setGameLogo(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            ''//ToDo
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
     /**
      * @Route("game/{gameId}/add-quest", methods={"POST"})
      *
