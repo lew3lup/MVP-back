@@ -154,7 +154,7 @@ class GameService
         ) {
             throw new BadRequestException();
         }
-        $this->descriptionService->setData($game, $data);
+        $this->descriptionService->setData($game, $data, 80, 500);
         $categories = $this->categoryRepo->findByIds($data['categories']);
         foreach ($categories as $category) {
             $gameCategory = (new GameCategory())
