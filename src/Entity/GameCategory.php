@@ -58,6 +58,7 @@ class GameCategory
     public function setGame(Game $game): GameCategory
     {
         $this->game = $game;
+        $game->addGameCategory($this);
         return $this;
     }
 

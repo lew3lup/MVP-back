@@ -26,7 +26,7 @@ class DescriptionService
         if (!$this->checkMultiLangData($data['description'], $maxDescriptionLength)) {
             throw new BadRequestException('INVALID_DESCRIPTION');
         }
-        return $entity->setName($data['name'])->setDescription($data['name']);
+        return $entity->setName($data['name'])->setDescription($data['description']);
     }
 
     /**

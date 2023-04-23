@@ -58,6 +58,7 @@ class GameChain
     public function setGame(Game $game): GameChain
     {
         $this->game = $game;
+        $game->addGameChain($this);
         return $this;
     }
 

@@ -343,6 +343,16 @@ class Game extends Descriptionable
     }
 
     /**
+     * @param GameCategory $gameCategory
+     * @return $this
+     */
+    public function addGameCategory(GameCategory $gameCategory): Game
+    {
+        $this->gameCategories[] = $gameCategory;
+        return $this;
+    }
+
+    /**
      * @return Collection|GameChain[]
      */
     public function getGameChains(): Collection
@@ -351,11 +361,31 @@ class Game extends Descriptionable
     }
 
     /**
+     * @param GameChain $gameChain
+     * @return $this
+     */
+    public function addGameChain(GameChain $gameChain): Game
+    {
+        $this->gameChains[] = $gameChain;
+        return $this;
+    }
+
+    /**
      * @return Collection|GameBacker[]
      */
     public function getGameBackers(): Collection
     {
         return $this->gameBackers;
+    }
+
+    /**
+     * @param GameBacker $gameBacker
+     * @return $this
+     */
+    public function addGameBacker(GameBacker $gameBacker): Game
+    {
+        $this->gameBackers[] = $gameBacker;
+        return $this;
     }
 
     /**

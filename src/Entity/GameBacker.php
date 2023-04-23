@@ -58,6 +58,7 @@ class GameBacker
     public function setGame(Game $game): GameBacker
     {
         $this->game = $game;
+        $game->addGameBacker($this);
         return $this;
     }
 
