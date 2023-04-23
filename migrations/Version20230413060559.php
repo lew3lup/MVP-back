@@ -41,7 +41,6 @@ final class Version20230413060559 extends AbstractMigration
             ADD COLUMN discord text default null,
             ADD COLUMN telegram text default null,
             ADD COLUMN coin_market_cap text default null,
-            ADD COLUMN images json default null,
             ADD COLUMN name json not null,
             ADD COLUMN description json not null,
             ADD UNIQUE (path)
@@ -117,6 +116,15 @@ final class Version20230413060559 extends AbstractMigration
             FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
             FOREIGN KEY (backer_id) REFERENCES backers ON DELETE CASCADE
         )');
+
+        //Image
+        $this->addSql('CREATE TABLE images (
+            id serial not null,
+            game_id integer not null,
+            url text not null,
+            PRIMARY KEY (id),
+            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE
+        )');
     }
 
     public function down(Schema $schema): void
@@ -128,7 +136,6 @@ final class Version20230413060559 extends AbstractMigration
             DROP COLUMN discord,
             DROP COLUMN telegram,
             DROP COLUMN coin_market_cap,
-            DROP COLUMN images,
             DROP COLUMN name,
             DROP COLUMN description
         ');
@@ -151,6 +158,7 @@ final class Version20230413060559 extends AbstractMigration
         $this->addSql('DROP TABLE chains');
         $this->addSql('DROP TABLE games_backers');
         $this->addSql('DROP TABLE backers');
+        $this->addSql('DROP TABLE images');
         $this->addSql('CREATE TABLE games_descriptions (
             id serial not null,
             lang char(2) not null,

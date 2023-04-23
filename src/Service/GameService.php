@@ -105,7 +105,7 @@ class GameService
     public function setGameLogo(Game $game, $logo): Game
     {
         $path = '';//ToDo
-        $this->imageService->saveImage($path, $logo);
+        $this->imageService->uploadImage($path, $logo);
         return $game->setLogo($path);
     }
 

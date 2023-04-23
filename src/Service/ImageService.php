@@ -17,7 +17,7 @@ class ImageService
         ]);
     }
 
-    public function saveImage(string $path, $content): void
+    public function uploadImage(string $path, $content): void
     {
         try {
             $this->s3->putObject([

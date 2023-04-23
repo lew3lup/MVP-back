@@ -85,8 +85,8 @@ class Game extends Descriptionable
      */
     private $deletedAt;
     /**
-     * @var string[]
-     * @ORM\Column(type="json", nullable=true)
+     * @var Image[]
+     * @ORM\OneToMany(targetEntity="Image", mappedBy="game")
      */
     private $images;
     /**
@@ -120,6 +120,7 @@ class Game extends Descriptionable
      */
     public function __construct()
     {
+        $this->images = new ArrayCollection();
         $this->quests = new ArrayCollection();
         $this->admins = new ArrayCollection();
         $this->gameCategories = new ArrayCollection();
@@ -310,24 +311,11 @@ class Game extends Descriptionable
     }
 
     /**
-     * @return string[]
+     * @return Collection|Image[]
      */
-    public function getImages(): array
+    public function getImages(): Collection
     {
-        return $this->images ?? [];
-    }
-
-    /**
-     * @param string $image
-     * @return Game
-     */
-    public function addImage(string $image): Game
-    {
-        if ($this->images === null) {
-            $this->images = [];
-        }
-        $this->images[] = $image;
-        return $this;
+        return $this->images;
     }
 
     /**
@@ -398,7 +386,6 @@ class Game extends Descriptionable
             'active'        => $this->active,
             'name'          => $this->name,
             'description'   => $this->description,
-            'images'        => $this->getImages(),
             'categories'    => $categories,
             'chains'        => $chains,
             'backers'       => $backers,
@@ -416,6 +403,9 @@ class Game extends Descriptionable
                 $quests[] = $quest->jsonSerializeDetailed();
             }
         }
-        return array_merge($this->jsonSerialize(), ['quests' => $quests]);
+        return array_merge($this->jsonSerialize(), [
+            'images' => $this->images,
+            'quests' => $quests
+        ]);
     }
 }
