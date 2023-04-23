@@ -15,5 +15,12 @@ use Doctrine\ORM\EntityRepository;
  */
 class BackerRepository extends EntityRepository
 {
-
+    /**
+     * @param string[] $names
+     * @return Backer[]
+     */
+    public function findByNames(array $names): array
+    {
+        return $this->findBy(['name' => $names]);
+    }
 }

@@ -87,7 +87,9 @@ final class Version20230413060559 extends AbstractMigration
             id serial not null,
             name text not null,
             short_name text default null,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            UNIQUE (name),
+            UNIQUE (short_name)
         )');
 
         //GameChain
@@ -104,7 +106,8 @@ final class Version20230413060559 extends AbstractMigration
         $this->addSql('CREATE TABLE backers (
             id serial not null,
             name text not null,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            UNIQUE (name)
         )');
 
         //GameBacker
@@ -123,7 +126,8 @@ final class Version20230413060559 extends AbstractMigration
             game_id integer not null,
             url text not null,
             PRIMARY KEY (id),
-            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE
+            FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
+            UNIQUE (url)
         )');
     }
 

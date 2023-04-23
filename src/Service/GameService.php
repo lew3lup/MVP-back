@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Backer;
 use App\Entity\Game;
 use App\Entity\GameAdmin;
+use App\Entity\GameBacker;
 use App\Entity\GameCategory;
 use App\Entity\GameChain;
 use App\Entity\User;
@@ -156,26 +158,43 @@ class GameService
         if (
             !isset($data['active']) ||
             !isset($data['categories']) || !is_array($data['categories']) ||
-            !isset($data['chains']) || !is_array($data['chains'])
+            !isset($data['chains']) || !is_array($data['chains']) ||
+            !isset($data['backers']) || !is_array($data['backers'])
         ) {
             throw new BadRequestException();
         }
         $this->descriptionService->setData($game, $data, 80, 500);
-        $categories = $this->categoryRepo->findByIds($data['categories']);
-        foreach ($categories as $category) {
-            $gameCategory = (new GameCategory())
-                ->setGame($game)
-                ->setCategory($category);
-            $this->em->persist($gameCategory);
+        if (!empty($data['categories'])) {
+            $categories = $this->categoryRepo->findByIds($data['categories']);
+            foreach ($categories as $category) {
+                $gameCategory = (new GameCategory())->setGame($game)->setCategory($category);
+                $this->em->persist($gameCategory);
+            }
         }
-        $chains = $this->chainRepo->findByIds($data['chains']);
-        foreach ($chains as $chain) {
-            $gameChain = (new GameChain())
-                ->setGame($game)
-                ->setChain($chain);
-            $this->em->persist($gameChain);
+        if (!empty($data['chains'])) {
+            $chains = $this->chainRepo->findByIds($data['chains']);
+            foreach ($chains as $chain) {
+                $gameChain = (new GameChain())->setGame($game)->setChain($chain);
+                $this->em->persist($gameChain);
+            }
         }
-        //ToDo: Backers
+        if (!empty($data['backers'])) {
+            $backers = $this->backerRepo->findByNames($data['backers']);
+            $existedBackersNames = [];
+            foreach ($backers as $backer) {
+                $gameBacker = (new GameBacker())->setGame($game)->setBacker($backer);
+                $this->em->persist($gameBacker);
+                $existedBackersNames[] = strtolower($backer->getName());
+            }
+            foreach ($data['backers'] as $backerName) {
+                if (!in_array(strtolower($backerName), $existedBackersNames)) {
+                    $backer = (new Backer())->setName($backerName);
+                    $gameBacker = (new GameBacker())->setGame($game)->setBacker($backer);
+                    $this->em->persist($backer);
+                    $this->em->persist($gameBacker);
+                }
+            }
+        }
         return $game
             ->setPath($data['path'])
             ->setHomePage($data['homePage'])
