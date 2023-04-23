@@ -71,3 +71,18 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\User'
+  App\Repository\CategoryRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Category'
+  App\Repository\ChainRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Chain'
+  App\Repository\BackerRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Backer'

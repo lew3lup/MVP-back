@@ -45,6 +45,7 @@ class GameAdminController extends ApiController
             throw $e;
         } catch (Exception $e) {
             $em->rollback();
+            $this->logger->error($e);
             throw new ConflictException('PATH_IS_ALREADY_IN_USE');
         }
         return $this->json([

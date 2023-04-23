@@ -404,7 +404,7 @@ class Game extends Descriptionable
             }
         }
         return array_merge($this->jsonSerialize(), [
-            'images' => $this->images,
+            'images' => $this->images->toArray(),
             'quests' => $quests
         ]);
     }

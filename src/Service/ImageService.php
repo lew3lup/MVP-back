@@ -12,19 +12,19 @@ class ImageService
 
     public function __construct()
     {
-        $this->s3 = new S3Client([
+        /*$this->s3 = new S3Client([
             //ToDo
-        ]);
+        ]);*/
     }
 
     public function uploadImage(string $path, $content): void
     {
-        try {
+        /*try {
             $this->s3->putObject([
                 //ToDo
             ]);
         } catch (S3Exception $e) {
             //ToDo
-        }
+        }*/
     }
 }

@@ -147,7 +147,11 @@ class GameService
         )) {
             throw new BadRequestException('INVALID_COIN_MARKET_CAP_LINK');
         }
-        if (!isset($data['active']) || !isset($data['categories']) || !is_array($data['categories'])) {
+        if (
+            !isset($data['active']) ||
+            !isset($data['categories']) || !is_array($data['categories']) ||
+            !isset($data['chains']) || !is_array($data['chains'])
+        ) {
             throw new BadRequestException();
         }
         $this->descriptionService->setData($game, $data);
