@@ -14,13 +14,29 @@ class DescriptionService
      */
     public function setData(Descriptionable $entity, array $data): Descriptionable
     {
-        //ToDo: детальные проверки
-        if (
-            empty($data['name']) || !is_array($data['name']) ||
-            empty($data['description']) || !is_array($data['description'])
-        ) {
-            throw new BadRequestException();
+        if (!$this->checkMultiLangData($data['name'])) {
+            throw new BadRequestException('INVALID_NAME');
+        }
+        if (!$this->checkMultiLangData($data['description'])) {
+            throw new BadRequestException('INVALID_DESCRIPTION');
         }
         return $entity->setName($data['name'])->setDescription($data['name']);
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    private function checkMultiLangData($data): bool
+    {
+        if (empty($data) || !is_array($data) || empty($data[Descriptionable::DEFAULT_LANGUAGE])) {
+            return false;
+        }
+        foreach ($data as $key => $value) {
+            if (!in_array($key, Descriptionable::LANGUAGES) || empty($value) || !is_string($value)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

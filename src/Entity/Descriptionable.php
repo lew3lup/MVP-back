@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 abstract class Descriptionable extends Serializable
 {
-    //ToDo: вынести в конфиг
+    //ToDo: возможно вынести в конфиг
     public const LANGUAGES = ['en', 'ru'];
     public const DEFAULT_LANGUAGE = 'en';
 
