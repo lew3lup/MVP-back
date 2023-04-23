@@ -99,6 +99,12 @@ class GameService
         foreach ($game->getGameCategories() as $gameCategory) {
             $this->em->remove($gameCategory);
         }
+        foreach ($game->getGameChains() as $gameChain) {
+            $this->em->remove($gameChain);
+        }
+        foreach ($game->getGameBackers() as $gameBacker) {
+            $this->em->remove($gameBacker);
+        }
         return $this->setData($game, $data);
     }
 
