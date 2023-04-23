@@ -116,10 +116,10 @@ class GameService
      */
     private function setData(Game $game, array $data): Game
     {
-        //ToDo: Backers
-
-        //ToDo: дополнительная валидация path
-        if (empty($data['path']) || strlen($data['path']) > 30) {
+        if (
+            empty($data['path']) || iconv_strlen($data['path']) > 30 ||
+            !preg_match('/^[a-z0-9\-_]+$/', $data['path'])
+        ) {
             throw new BadRequestException('INVALID_PATH');
         }
         if (empty($data['homePage']) || !filter_var($data['homePage'], FILTER_VALIDATE_URL)) {
@@ -169,6 +169,7 @@ class GameService
                 ->setChain($chain);
             $this->em->persist($gameChain);
         }
+        //ToDo: Backers
         return $game
             ->setPath($data['path'])
             ->setHomePage($data['homePage'])
@@ -176,7 +177,6 @@ class GameService
             ->setDiscord(!empty($data['discord']) ? $data['discord'] : null)
             ->setTelegram(!empty($data['telegram']) ? $data['telegram'] : null)
             ->setCoinMarketCap(!empty($data['coinMarketCap']) ? $data['coinMarketCap'] : null)
-            ->setActive($data['active'])
-        ;
+            ->setActive($data['active']);
     }
 }
