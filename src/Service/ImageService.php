@@ -31,7 +31,7 @@ class ImageService
      * @param UploadedFile $file
      * @return string
      */
-    public function uploadImage(string $path, UploadedFile $file): string
+    public function uploadImageFile(string $path, UploadedFile $file): string
     {
         return $this->s3Service->uploadFile($path, $file->getContent());
     }
@@ -39,7 +39,7 @@ class ImageService
     /**
      * @param string $path
      */
-    public function removeImage(string $path): void
+    public function removeImageFile(string $path): void
     {
         $this->s3Service->removeFile($path);
     }

@@ -119,7 +119,7 @@ class GameService
     public function setGameLogo(Game $game, UploadedFile $logo): Game
     {
         //ToDo: валидация файла
-        return $game->setLogo($this->imageService->uploadImage($this->getGameLogoPath($game), $logo));
+        return $game->setLogo($this->imageService->uploadImageFile($this->getGameLogoPath($game), $logo));
     }
 
     /**
@@ -128,7 +128,7 @@ class GameService
      */
     public function removeGameLogo(Game $game): Game
     {
-        $this->imageService->removeImage($this->getGameLogoPath($game));
+        $this->imageService->removeImageFile($this->getGameLogoPath($game));
         return $game->setLogo(null);
     }
 
