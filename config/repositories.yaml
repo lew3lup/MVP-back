@@ -86,3 +86,8 @@ services:
     lazy: true
     arguments:
       - 'App\Entity\Backer'
+  App\Repository\ImageRepository:
+    factory: ['@App\Service\Doctrine\RepositoryFactory', 'getRepository']
+    lazy: true
+    arguments:
+      - 'App\Entity\Image'

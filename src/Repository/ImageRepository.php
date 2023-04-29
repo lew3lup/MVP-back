@@ -15,5 +15,28 @@ use Doctrine\ORM\EntityRepository;
  */
 class ImageRepository extends EntityRepository
 {
-
+    /**
+     * @param int $id
+     * @param int $adminId
+     * @return Image|null
+     */
+    public function findOneByIdAndAdminId(int $id, int $adminId): ?Image
+    {
+        $result = $this->createQueryBuilder('i')
+            ->innerJoin('i.game', 'g')
+            ->innerJoin('g.admins', 'ga')
+            ->innerJoin('ga.user', 'u')
+            ->where('i.id = :id')
+            ->andWhere('u.id = :adminId')
+            ->setParameter('id', $id)
+            ->setParameter('adminId', $adminId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+        if (!empty($result)) {
+            return $result[0];
+        }
+        return null;
+    }
 }

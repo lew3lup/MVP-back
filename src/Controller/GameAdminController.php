@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Exception\BadRequestException;
 use App\Exception\ConflictException;
 use App\Service\GameService;
+use App\Service\ImageService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -190,6 +191,28 @@ class GameAdminController extends ApiController
     }
 
     /**
+     * @Route("image/{imageId}", methods={"DELETE"})
+     *
+     * @param int $imageId
+     * @param Request $request
+     * @param ImageService $imageService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeImage(
+        int $imageId,
+        Request $request,
+        ImageService $imageService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $imageService->removeImage(
+            $imageService->getByIdAndAdminId($imageId, $this->getCurrentUser($request)->getId())
+        );
+        $em->flush();
+        return $this->json(['type' => 'success']);
+    }
+
+    /**
      * @Route("game/{gameId}/add-quest", methods={"POST"})
      *
      * @param int $gameId
@@ -341,6 +364,7 @@ class GameAdminController extends ApiController
      * @Route("game/{gameId}", methods={"OPTIONS"})
      * @Route("game/{gameId}/logo", methods={"OPTIONS"})
      * @Route("game/{gameId}/add-image", methods={"OPTIONS"})
+     * @Route("image/{imageId}", methods={"OPTIONS"})
      * @Route("game/{gameId}/add-quest", methods={"OPTIONS"})
      * @Route("quest/{questId}", methods={"OPTIONS"})
      * @Route("quest/{questId}/add-task", methods={"OPTIONS"})

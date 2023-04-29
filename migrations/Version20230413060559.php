@@ -124,9 +124,11 @@ final class Version20230413060559 extends AbstractMigration
         $this->addSql('CREATE TABLE images (
             id serial not null,
             game_id integer not null,
+            path text not null,
             url text not null,
             PRIMARY KEY (id),
             FOREIGN KEY (game_id) REFERENCES games ON DELETE CASCADE,
+            UNIQUE (path),
             UNIQUE (url)
         )');
     }

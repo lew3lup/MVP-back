@@ -32,6 +32,11 @@ class Image extends Serializable
      * @var string
      * @ORM\Column(type="text")
      */
+    private $path;
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     */
     private $url;
 
     /**
@@ -58,6 +63,24 @@ class Image extends Serializable
     {
         $this->game = $game;
         $game->addImage($this);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param string $path
+     * @return Image
+     */
+    public function setPath(string $path): Image
+    {
+        $this->path = $path;
         return $this;
     }
 
