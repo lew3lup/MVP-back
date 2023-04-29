@@ -119,8 +119,7 @@ class GameService
     public function setGameLogo(Game $game, UploadedFile $logo): Game
     {
         //ToDo: валидация файла
-        $path = 'games/' . $game->getId() . '/logo.jpg';
-        return $game->setLogo($this->imageService->uploadImage($path, $logo));
+        return $game->setLogo($this->imageService->uploadImage($this->getGameLogoPath($game), $logo));
     }
 
     /**
@@ -129,7 +128,7 @@ class GameService
      */
     public function removeGameLogo(Game $game): Game
     {
-        $this->imageService->removeImage($game->getLogo());
+        $this->imageService->removeImage($this->getGameLogoPath($game));
         return $game->setLogo(null);
     }
 
@@ -219,5 +218,14 @@ class GameService
             ->setTelegram(!empty($data['telegram']) ? $data['telegram'] : null)
             ->setCoinMarketCap(!empty($data['coinMarketCap']) ? $data['coinMarketCap'] : null)
             ->setActive($data['active']);
+    }
+
+    /**
+     * @param Game $game
+     * @return string
+     */
+    private function getGameLogoPath(Game $game): string
+    {
+        return 'games/' . $game->getId() . '/logo.jpg';
     }
 }

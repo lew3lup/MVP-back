@@ -66,8 +66,19 @@ class S3Service
         }
     }
 
+    /**
+     * @param string $path
+     */
     public function removeFile(string $path): void
     {
-        //ToDo
+        try {
+            $this->s3->deleteObject([
+                'Bucket' => $this->bucketName,
+                'Key' => $this->rootDir . '/' . $path
+            ]);
+        } catch (S3Exception $e) {
+            $this->logger->error($e);
+            throw new ServiceUnavailableException();
+        }
     }
 }

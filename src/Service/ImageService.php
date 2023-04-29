@@ -2,21 +2,14 @@
 
 namespace App\Service;
 
-use Aws\S3\S3Client;
-use Aws\S3\Exception\S3Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageService
 {
+    /** @var S3Service */
     private $s3Service;
-    /** @var S3Client */
-    private $s3;
-    /** @var string */
-    private $bucketName;
-    /** @var string */
-    private $rootDir;
 
     /**
      * ImageService constructor.
