@@ -17,6 +17,7 @@ use App\Repository\ChainRepository;
 use App\Repository\GameRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class GameService
 {
@@ -110,11 +111,26 @@ class GameService
         return $this->setData($game, $data);
     }
 
-    public function setGameLogo(Game $game, $logo): Game
+    /**
+     * @param Game $game
+     * @param UploadedFile $logo
+     * @return Game
+     */
+    public function setGameLogo(Game $game, UploadedFile $logo): Game
     {
-        $path = '';//ToDo
-        $this->imageService->uploadImage($path, $logo);
-        return $game->setLogo($path);
+        //ToDo: валидация файла
+        $path = 'games/' . $game->getId() . '/logo.jpg';
+        return $game->setLogo($this->imageService->uploadImage($path, $logo));
+    }
+
+    /**
+     * @param Game $game
+     * @return Game
+     */
+    public function removeGameLogo(Game $game): Game
+    {
+        $this->imageService->removeImage($game->getLogo());
+        return $game->setLogo(null);
     }
 
     /**

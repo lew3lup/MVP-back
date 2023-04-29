@@ -10,6 +10,7 @@ use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
 use Exception;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,15 +105,53 @@ class GameAdminController extends ApiController
         ]);
     }
 
+    /**
+     * @Route("game/{gameId}/logo", methods={"POST"})
+     *
+     * @param int $gameId
+     * @param Request $request
+     * @param GameService $gameService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
     public function setGameLogo(
         int $gameId,
         Request $request,
         GameService $gameService,
         EntityManagerInterface $em
     ): JsonResponse {
+        $file = $request->files->get('logo');
+        if (!$file) {
+            throw new BadRequestException();
+        }
         $game = $gameService->setGameLogo(
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            ''//ToDo
+            $file
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
+    /**
+     * @Route("game/{gameId}/logo", methods={"DELETE"})
+     *
+     * @param int $gameId
+     * @param Request $request
+     * @param GameService $gameService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeGameLogo(
+        int $gameId,
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $game = $gameService->removeGameLogo(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId())
         );
         $em->flush();
         return $this->json([
@@ -271,6 +310,7 @@ class GameAdminController extends ApiController
     /**
      * @Route("add-game", methods={"OPTIONS"})
      * @Route("game/{gameId}", methods={"OPTIONS"})
+     * @Route("game/{gameId}/logo", methods={"OPTIONS"})
      * @Route("game/{gameId}/add-quest", methods={"OPTIONS"})
      * @Route("quest/{questId}", methods={"OPTIONS"})
      * @Route("quest/{questId}/add-task", methods={"OPTIONS"})
