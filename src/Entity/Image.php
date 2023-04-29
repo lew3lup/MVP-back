@@ -57,6 +57,7 @@ class Image extends Serializable
     public function setGame(Game $game): Image
     {
         $this->game = $game;
+        $game->addImage($this);
         return $this;
     }
 

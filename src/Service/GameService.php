@@ -8,6 +8,7 @@ use App\Entity\GameAdmin;
 use App\Entity\GameBacker;
 use App\Entity\GameCategory;
 use App\Entity\GameChain;
+use App\Entity\Image;
 use App\Entity\User;
 use App\Exception\NotFoundException;
 use App\Exception\BadRequestException;
@@ -134,6 +135,20 @@ class GameService
 
     /**
      * @param Game $game
+     * @param UploadedFile $file
+     * @return Game
+     */
+    public function addGameImage(Game $game, UploadedFile $file): Game
+    {
+        //ToDo: валидация файла
+        $image = (new Image())->setGame($game);
+        $this->imageService->uploadImage($image, $this->getGameImagePath($game), $file);
+        $this->em->persist($image);
+        return $game;
+    }
+
+    /**
+     * @param Game $game
      * @param array $data
      * @return Game
      */
@@ -226,6 +241,24 @@ class GameService
      */
     private function getGameLogoPath(Game $game): string
     {
-        return 'games/' . $game->getId() . '/logo.jpg';
+        return $this->getGameImagesPath($game) . 'logo.jpg';
+    }
+
+    /**
+     * @param Game $game
+     * @return string
+     */
+    private function getGameImagePath(Game $game): string
+    {
+        return $this->getGameImagesPath($game) . time() . '_' . rand(1000, 9999) . '.jpg';
+    }
+
+    /**
+     * @param Game $game
+     * @return string
+     */
+    private function getGameImagesPath(Game $game): string
+    {
+        return 'games/' . $game->getId() . '/';
     }
 }

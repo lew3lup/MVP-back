@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Game;
+use App\Entity\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,6 +26,17 @@ class ImageService
             $parameterBag->get('imagesBucketName'),
             $parameterBag->get('imagesRootDir')
         );
+    }
+
+    /**
+     * @param Image $image
+     * @param string $path
+     * @param UploadedFile $file
+     * @return Image
+     */
+    public function uploadImage(Image $image, string $path, UploadedFile $file): Image
+    {
+        return $image->setUrl($this->uploadImageFile($path, $file));
     }
 
     /**

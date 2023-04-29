@@ -319,6 +319,16 @@ class Game extends Descriptionable
     }
 
     /**
+     * @param Image $image
+     * @return $this
+     */
+    public function addImage(Image $image): Game
+    {
+        $this->images[] = $image;
+        return $this;
+    }
+
+    /**
      * @return Collection|Quest[]
      */
     public function getQuests(): Collection
