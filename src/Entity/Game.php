@@ -267,7 +267,7 @@ class Game extends Descriptionable
      */
     public function isActive(): bool
     {
-        return $this->active;
+        return $this->active && !$this->deleted;
     }
 
     /**

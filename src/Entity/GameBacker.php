@@ -24,7 +24,7 @@ class GameBacker
     private $id;
     /**
      * @var Game
-     * @ORM\ManyToOne(targetEntity="Game", inversedBy="gameDescriptions")
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="gameBackers")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     private $game;

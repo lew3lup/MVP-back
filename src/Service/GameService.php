@@ -66,6 +66,57 @@ class GameService
     }
 
     /**
+     * @return array
+     */
+    public function getGameFilters(): array
+    {
+        $gamesCategories = $this->categoryRepo->findAll();
+        $gamesChains = $this->chainRepo->findAll();
+        $gamesBackers = $this->backerRepo->findAll();
+        $activeGamesCategories = [];
+        $activeGamesChains = [];
+        $activeGamesBackers = [];
+        foreach ($gamesCategories as $category) {
+            if ($category->getGameCategories()) {
+                foreach ($category->getGameCategories() as $gameCategory) {
+                    if ($gameCategory->getGame()->isActive()) {
+                        $activeGamesCategories[] = $category;
+                        break;
+                    }
+                }
+            }
+        }
+        foreach ($gamesChains as $chain) {
+            if ($chain->getGameChains()) {
+                foreach ($chain->getGameChains() as $gameChain) {
+                    if ($gameChain->getGame()->isActive()) {
+                        $activeGamesChains[] = $chain;
+                        break;
+                    }
+                }
+            }
+        }
+        foreach ($gamesBackers as $backer) {
+            if ($backer->getGameBackers()) {
+                foreach ($backer->getGameBackers() as $gameBacker) {
+                    if ($gameBacker->getGame()->isActive()) {
+                        $activeGamesBackers[] = $backer;
+                        break;
+                    }
+                }
+            }
+        }
+        return [
+            'gamesCategories' => $gamesCategories,
+            'gamesChains' => $gamesChains,
+            'gamesBackers' => $gamesBackers,
+            'activeGamesCategories' => $activeGamesCategories,
+            'activeGamesChains' => $activeGamesChains,
+            'activeGamesBackers' => $activeGamesBackers,
+        ];
+    }
+
+    /**
      * @param int $id
      * @param int $adminId
      * @return Game

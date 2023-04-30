@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -32,6 +34,19 @@ class Chain extends Serializable
      * @ORM\Column(type="text", name="short_name", nullable=true)
      */
     private $shortName;
+    /**
+     * @var GameChain[]
+     * @ORM\OneToMany(targetEntity="GameChain", mappedBy="chain")
+     */
+    private $gameChains;
+
+    /**
+     * Chain constructor.
+     */
+    public function __construct()
+    {
+        $this->gameChains = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -55,6 +70,14 @@ class Chain extends Serializable
     public function getShortName(): string
     {
         return $this->shortName ?? $this->name;
+    }
+
+    /**
+     * @return Collection|GameChain[]
+     */
+    public function getGameChains(): Collection
+    {
+        return $this->gameChains;
     }
 
     /**

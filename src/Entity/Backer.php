@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,6 +29,19 @@ class Backer extends Serializable
      * @ORM\Column(type="text")
      */
     private $name;
+    /**
+     * @var GameBacker[]
+     * @ORM\OneToMany(targetEntity="GameBacker", mappedBy="backer")
+     */
+    private $gameBackers;
+
+    /**
+     * Backer constructor.
+     */
+    public function __construct()
+    {
+        $this->gameBackers = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -52,6 +67,14 @@ class Backer extends Serializable
     {
         $this->name = $name;
         return $this;
+    }
+
+    /**
+     * @return Collection|GameBacker[]
+     */
+    public function getGameBackers(): Collection
+    {
+        return $this->gameBackers;
     }
 
     /**

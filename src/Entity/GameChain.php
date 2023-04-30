@@ -24,7 +24,7 @@ class GameChain
     private $id;
     /**
      * @var Game
-     * @ORM\ManyToOne(targetEntity="Game", inversedBy="gameDescriptions")
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="gameChains")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     private $game;
