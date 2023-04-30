@@ -88,7 +88,7 @@ class Chain extends Serializable
         return [
             'id'        => $this->id,
             'name'      => $this->name,
-            'shortName' => $this->shortName,
+            'shortName' => $this->getShortName(),
         ];
     }
 }

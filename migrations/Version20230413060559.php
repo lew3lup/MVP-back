@@ -91,6 +91,24 @@ final class Version20230413060559 extends AbstractMigration
             UNIQUE (name),
             UNIQUE (short_name)
         )');
+        $this->addSql('INSERT INTO chains (id, name, short_name) VALUES
+            (1, \'Ethereum\', NULL),
+            (2, \'Binance Smart Chain\', \'BSC\'),
+            (3, \'Arbitrum\', NULL),
+            (4, \'Polygon\', NULL),
+            (5, \'Optimism\', NULL),
+            (6, \'Avalanche\', NULL),
+            (7, \'Moonbeam\', NULL),
+            (8, \'Solana\', NULL),
+            (9, \'Aptos\', NULL),
+            (10, \'Fantom\', NULL),
+            (11, \'OKT Chain\', \'OKTC\'),
+            (12, \'IoTeX\', NULL),
+            (13, \'Boba BNB\', \'Boba_BNB\'),
+            (14, \'Boba ETH\', \'Boba_ETH\'),
+            (15, \'Boba Moonbeam\', \'Boba_Moonbeam\'),
+            (16, \'Boba Avalanche\', \'Boba_AVAX\')
+        ');
 
         //GameChain
         $this->addSql('CREATE TABLE games_chains (
