@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Image;
+use App\Exception\IncorrectFileFormatException;
 use App\Exception\NotFoundException;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -93,5 +94,15 @@ class ImageService
     public function removeImageFile(string $path): void
     {
         $this->s3Service->removeFile($path);
+    }
+
+    /**
+     * @param UploadedFile $file
+     */
+    public function validateImageFile(UploadedFile $file): void
+    {
+        if (!$file->getMimeType() || !in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+            throw new IncorrectFileFormatException();
+        }
     }
 }

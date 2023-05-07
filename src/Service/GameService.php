@@ -170,7 +170,8 @@ class GameService
      */
     public function setGameLogo(Game $game, UploadedFile $logo): Game
     {
-        //ToDo: валидация файла
+        $this->imageService->validateImageFile($logo);
+        //ToDo: ресайз файла
         return $game->setLogo($this->imageService->uploadImageFile($this->getGameLogoPath($game), $logo));
     }
 
@@ -191,7 +192,11 @@ class GameService
      */
     public function addGameImage(Game $game, UploadedFile $file): Game
     {
-        //ToDo: валидация файла
+        if (count($game->getImages()) >= 5) {
+            throw new BadRequestException();
+        }
+        $this->imageService->validateImageFile($file);
+        //ToDo: ресайз файла
         $image = (new Image())->setGame($game);
         $this->imageService->uploadImage($image, $this->getGameImagePath($game), $file);
         $this->em->persist($image);
