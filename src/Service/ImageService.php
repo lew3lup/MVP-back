@@ -61,11 +61,20 @@ class ImageService
      * @param Image $image
      * @param string $path
      * @param UploadedFile $file
+     * @param int $newWidth
+     * @param int $newHeight
+     * @param int $quality
      * @return Image
      */
-    public function uploadImage(Image $image, string $path, UploadedFile $file): Image
-    {
-        return $image->setPath($path)->setUrl($this->uploadImageFile($path, $file));
+    public function uploadImage(
+        Image $image,
+        string $path,
+        UploadedFile $file,
+        int $newWidth = 0,
+        int $newHeight = 0,
+        int $quality = 98
+    ): Image {
+        return $image->setPath($path)->setUrl($this->uploadImageFile($path, $file, $newWidth, $newHeight, $quality));
     }
 
     /**
@@ -81,10 +90,22 @@ class ImageService
     /**
      * @param string $path
      * @param UploadedFile $file
+     * @param int $newWidth
+     * @param int $newHeight
+     * @param int $quality
      * @return string
      */
-    public function uploadImageFile(string $path, UploadedFile $file): string
-    {
+    public function uploadImageFile(
+        string $path,
+        UploadedFile $file,
+        int $newWidth = 0,
+        int $newHeight = 0,
+        int $quality = 98
+    ): string {
+        $this->validateImageFile($file);
+        if ($newWidth || $newHeight || $quality !== 100) {
+            $this->compressImage($file, $newWidth, $newHeight, $quality);
+        }
         return $this->s3Service->uploadFile($path, $file->getContent());
     }
 
@@ -99,10 +120,64 @@ class ImageService
     /**
      * @param UploadedFile $file
      */
-    public function validateImageFile(UploadedFile $file): void
+    private function validateImageFile(UploadedFile $file): void
     {
         if (!$file->getMimeType() || !in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
             throw new IncorrectFileFormatException();
         }
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param int $newWidth
+     * @param int $newHeight
+     * @param int $quality
+     */
+    private function compressImage(UploadedFile $file, int $newWidth, int $newHeight, int $quality = 100): void
+    {
+        list($width, $height) = getimagesize($file->getRealPath());
+        if ($newWidth || $newHeight) {
+            $ratio = $width / $height;
+            if ($newWidth && $newWidth < $width) {
+                $newHeight1 = $newWidth / $ratio;
+                if ($newHeight && $newHeight < $newHeight1) {
+                    $newWidth = (int)($newHeight * $ratio);
+                } else {
+                    $newHeight = (int)$newHeight1;
+                }
+            } elseif ($newHeight && $newHeight < $height) {
+                $newWidth1 = $newHeight * $ratio;
+                if ($newWidth && $newWidth < $newWidth1) {
+                    $newHeight = (int)($newWidth / $ratio);
+                } else {
+                    $newWidth = (int)$newWidth1;
+                }
+            }
+        } else {
+            $newWidth = $width;
+            $newHeight = $height;
+        }
+        $imageTrueColor = imagecreatetruecolor($newWidth, $newHeight);
+        /*if ($file->getMimeType() === 'image/jpeg') {
+            $image = imagecreatefromjpeg()
+        } elseif ($file->getMimeType() === 'image/png') {
+
+        } else {
+            throw new IncorrectFileFormatException();
+        }*/
+        $image = imagecreatefromstring($file->getContent());
+        imagecopyresampled(
+            $imageTrueColor,
+            $image,
+            0,
+            0,
+            0,
+            0,
+            $newWidth,
+            $newHeight,
+            $width,
+            $height
+        );
+        imagejpeg($imageTrueColor, $file->getRealPath(), $quality);
     }
 }
