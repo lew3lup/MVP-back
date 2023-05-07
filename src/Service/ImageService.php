@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageService
 {
+    public const RESIZE_TYPE_CONTAIN = 1;
+    public const RESIZE_TYPE_COVER = 2;
+
     /** @var EntityManagerInterface */
     private $em;
     /** @var ImageRepository */
@@ -63,6 +66,7 @@ class ImageService
      * @param UploadedFile $file
      * @param int $newWidth
      * @param int $newHeight
+     * @param int $resizeType
      * @param int $quality
      * @return Image
      */
@@ -72,9 +76,17 @@ class ImageService
         UploadedFile $file,
         int $newWidth = 0,
         int $newHeight = 0,
+        int $resizeType = self::RESIZE_TYPE_CONTAIN,
         int $quality = 98
     ): Image {
-        return $image->setPath($path)->setUrl($this->uploadImageFile($path, $file, $newWidth, $newHeight, $quality));
+        return $image->setPath($path)->setUrl($this->uploadImageFile(
+            $path,
+            $file,
+            $newWidth,
+            $newHeight,
+            $resizeType,
+            $quality
+        ));
     }
 
     /**
@@ -92,6 +104,7 @@ class ImageService
      * @param UploadedFile $file
      * @param int $newWidth
      * @param int $newHeight
+     * @param int $resizeType
      * @param int $quality
      * @return string
      */
@@ -100,11 +113,12 @@ class ImageService
         UploadedFile $file,
         int $newWidth = 0,
         int $newHeight = 0,
+        int $resizeType = self::RESIZE_TYPE_CONTAIN,
         int $quality = 98
     ): string {
         $this->validateImageFile($file);
         if ($newWidth || $newHeight || $quality !== 100) {
-            $this->compressImage($file, $newWidth, $newHeight, $quality);
+            $this->compressImage($file, $newWidth, $newHeight, $resizeType, $quality);
         }
         return $this->s3Service->uploadFile($path, $file->getContent());
     }
@@ -131,26 +145,52 @@ class ImageService
      * @param UploadedFile $file
      * @param int $newWidth
      * @param int $newHeight
+     * @param int $resizeType
      * @param int $quality
      */
-    private function compressImage(UploadedFile $file, int $newWidth, int $newHeight, int $quality = 100): void
-    {
+    private function compressImage(
+        UploadedFile $file,
+        int $newWidth,
+        int $newHeight,
+        int $resizeType,
+        int $quality = 100
+    ): void {
         list($width, $height) = getimagesize($file->getRealPath());
         if ($newWidth || $newHeight) {
             $ratio = $width / $height;
-            if ($newWidth && $newWidth < $width) {
-                $newHeight1 = $newWidth / $ratio;
-                if ($newHeight && $newHeight < $newHeight1) {
-                    $newWidth = (int)($newHeight * $ratio);
-                } else {
-                    $newHeight = (int)$newHeight1;
+            if ($resizeType === self::RESIZE_TYPE_COVER) {
+                //Cover
+                if ($newWidth && $newWidth < $width) {
+                    $newHeight1 = $newWidth / $ratio;
+                    if ($newHeight && $newHeight > $newHeight1) {
+                        $newWidth = (int)($newHeight * $ratio);
+                    } else {
+                        $newHeight = (int)$newHeight1;
+                    }
+                } elseif ($newHeight && $newHeight < $height) {
+                    $newWidth1 = $newHeight * $ratio;
+                    if ($newWidth && $newWidth > $newWidth1) {
+                        $newHeight = (int)($newWidth / $ratio);
+                    } else {
+                        $newWidth = (int)$newWidth1;
+                    }
                 }
-            } elseif ($newHeight && $newHeight < $height) {
-                $newWidth1 = $newHeight * $ratio;
-                if ($newWidth && $newWidth < $newWidth1) {
-                    $newHeight = (int)($newWidth / $ratio);
-                } else {
-                    $newWidth = (int)$newWidth1;
+            } else {
+                //Contain
+                if ($newWidth && $newWidth < $width) {
+                    $newHeight1 = $newWidth / $ratio;
+                    if ($newHeight && $newHeight < $newHeight1) {
+                        $newWidth = (int)($newHeight * $ratio);
+                    } else {
+                        $newHeight = (int)$newHeight1;
+                    }
+                } elseif ($newHeight && $newHeight < $height) {
+                    $newWidth1 = $newHeight * $ratio;
+                    if ($newWidth && $newWidth < $newWidth1) {
+                        $newHeight = (int)($newWidth / $ratio);
+                    } else {
+                        $newWidth = (int)$newWidth1;
+                    }
                 }
             }
         } else {
@@ -158,13 +198,6 @@ class ImageService
             $newHeight = $height;
         }
         $imageTrueColor = imagecreatetruecolor($newWidth, $newHeight);
-        /*if ($file->getMimeType() === 'image/jpeg') {
-            $image = imagecreatefromjpeg()
-        } elseif ($file->getMimeType() === 'image/png') {
-
-        } else {
-            throw new IncorrectFileFormatException();
-        }*/
         $image = imagecreatefromstring($file->getContent());
         imagecopyresampled(
             $imageTrueColor,

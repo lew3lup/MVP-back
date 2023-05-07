@@ -174,7 +174,8 @@ class GameService
             $this->getGameLogoPath($game),
             $logo,
             250,
-            250
+            250,
+            ImageService::RESIZE_TYPE_COVER
         ));
     }
 
