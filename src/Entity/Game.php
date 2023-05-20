@@ -27,9 +27,43 @@ class Game extends Descriptionable
     private $id;
     /**
      * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $logo;
+    /**
+     * SEO URL на нашем сайте
+     *
+     * @var string
      * @ORM\Column(type="text")
      */
-    private $url;
+    private $path;
+    /**
+     * Сайт игры
+     *
+     * @var string
+     * @ORM\Column(type="text", name="home_page")
+     */
+    private $homePage;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $twitter;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $discord;
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $telegram;
+    /**
+     * @var string
+     * @ORM\Column(type="text", name="coin_market_cap", nullable=true)
+     */
+    private $coinMarketCap;
     /**
      * @var bool
      * @ORM\Column(type="boolean")
@@ -51,10 +85,10 @@ class Game extends Descriptionable
      */
     private $deletedAt;
     /**
-     * @var GameDescription[]
-     * @ORM\OneToMany(targetEntity="GameDescription", mappedBy="game")
+     * @var Image[]
+     * @ORM\OneToMany(targetEntity="Image", mappedBy="game")
      */
-    private $descriptions;
+    private $images;
     /**
      * @var Quest[]
      * @ORM\OneToMany(targetEntity="Quest", mappedBy="game")
@@ -65,15 +99,33 @@ class Game extends Descriptionable
      * @ORM\OneToMany(targetEntity="GameAdmin", mappedBy="game")
      */
     private $admins;
+    /**
+     * @var GameCategory[]
+     * @ORM\OneToMany(targetEntity="GameCategory", mappedBy="game")
+     */
+    private $gameCategories;
+    /**
+     * @var GameChain[]
+     * @ORM\OneToMany(targetEntity="GameChain", mappedBy="game")
+     */
+    private $gameChains;
+    /**
+     * @var GameBacker[]
+     * @ORM\OneToMany(targetEntity="GameBacker", mappedBy="game")
+     */
+    private $gameBackers;
 
     /**
      * Game constructor.
      */
     public function __construct()
     {
-        $this->descriptions = new ArrayCollection();
+        $this->images = new ArrayCollection();
         $this->quests = new ArrayCollection();
         $this->admins = new ArrayCollection();
+        $this->gameCategories = new ArrayCollection();
+        $this->gameChains = new ArrayCollection();
+        $this->gameBackers = new ArrayCollection();
     }
 
     /**
@@ -87,18 +139,126 @@ class Game extends Descriptionable
     /**
      * @return string
      */
-    public function getUrl(): string
+    public function getLogo(): ?string
     {
-        return $this->url;
+        return $this->logo;
     }
 
     /**
-     * @param string $url
+     * @param string $logo
      * @return Game
      */
-    public function setUrl(string $url): Game
+    public function setLogo(?string $logo): Game
     {
-        $this->url = $url;
+        $this->logo = $logo;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param string $path
+     * @return Game
+     */
+    public function setPath(string $path): Game
+    {
+        $this->path = $path;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHomePage(): string
+    {
+        return $this->homePage;
+    }
+
+    /**
+     * @param string $homePage
+     * @return Game
+     */
+    public function setHomePage(string $homePage): Game
+    {
+        $this->homePage = $homePage;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTwitter(): ?string
+    {
+        return $this->twitter;
+    }
+
+    /**
+     * @param string $twitter
+     * @return Game
+     */
+    public function setTwitter(?string $twitter): Game
+    {
+        $this->twitter = $twitter;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiscord(): ?string
+    {
+        return $this->discord;
+    }
+
+    /**
+     * @param string $discord
+     * @return Game
+     */
+    public function setDiscord(?string $discord): Game
+    {
+        $this->discord = $discord;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTelegram(): ?string
+    {
+        return $this->telegram;
+    }
+
+    /**
+     * @param string $telegram
+     * @return Game
+     */
+    public function setTelegram(?string $telegram): Game
+    {
+        $this->telegram = $telegram;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCoinMarketCap(): string
+    {
+        return $this->coinMarketCap;
+    }
+
+    /**
+     * @param string $coinMarketCap
+     * @return Game
+     */
+    public function setCoinMarketCap(?string $coinMarketCap): Game
+    {
+        $this->coinMarketCap = $coinMarketCap;
         return $this;
     }
 
@@ -107,7 +267,7 @@ class Game extends Descriptionable
      */
     public function isActive(): bool
     {
-        return $this->active;
+        return $this->active && !$this->deleted;
     }
 
     /**
@@ -151,6 +311,24 @@ class Game extends Descriptionable
     }
 
     /**
+     * @return Collection|Image[]
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param Image $image
+     * @return $this
+     */
+    public function addImage(Image $image): Game
+    {
+        $this->images[] = $image;
+        return $this;
+    }
+
+    /**
      * @return Collection|Quest[]
      */
     public function getQuests(): Collection
@@ -167,15 +345,90 @@ class Game extends Descriptionable
     }
 
     /**
+     * @return Collection|GameCategory[]
+     */
+    public function getGameCategories(): Collection
+    {
+        return $this->gameCategories;
+    }
+
+    /**
+     * @param GameCategory $gameCategory
+     * @return $this
+     */
+    public function addGameCategory(GameCategory $gameCategory): Game
+    {
+        $this->gameCategories[] = $gameCategory;
+        return $this;
+    }
+
+    /**
+     * @return Collection|GameChain[]
+     */
+    public function getGameChains(): Collection
+    {
+        return $this->gameChains;
+    }
+
+    /**
+     * @param GameChain $gameChain
+     * @return $this
+     */
+    public function addGameChain(GameChain $gameChain): Game
+    {
+        $this->gameChains[] = $gameChain;
+        return $this;
+    }
+
+    /**
+     * @return Collection|GameBacker[]
+     */
+    public function getGameBackers(): Collection
+    {
+        return $this->gameBackers;
+    }
+
+    /**
+     * @param GameBacker $gameBacker
+     * @return $this
+     */
+    public function addGameBacker(GameBacker $gameBacker): Game
+    {
+        $this->gameBackers[] = $gameBacker;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
     {
+        $categories = [];
+        foreach ($this->gameCategories as $gameCategory) {
+            $categories[] = $gameCategory->getCategory();
+        }
+        $chains = [];
+        foreach ($this->gameChains as $gameChain) {
+            $chains[] = $gameChain->getChain();
+        }
+        $backers = [];
+        foreach ($this->gameBackers as $gameBacker) {
+            $backers[] = $gameBacker->getBacker();
+        }
         return [
             'id'            => $this->id,
-            'url'           => $this->url,
+            'logo'          => $this->logo,
+            'path'          => $this->path,
+            'homePage'      => $this->homePage,
+            'twitter'       => $this->twitter,
+            'discord'       => $this->discord,
+            'telegram'      => $this->telegram,
             'active'        => $this->active,
-            'descriptions'  => $this->descriptions->toArray(),
+            'name'          => $this->name,
+            'description'   => $this->description,
+            'categories'    => $categories,
+            'chains'        => $chains,
+            'backers'       => $backers,
         ];
     }
 
@@ -190,6 +443,9 @@ class Game extends Descriptionable
                 $quests[] = $quest->jsonSerializeDetailed();
             }
         }
-        return array_merge($this->jsonSerialize(), ['quests' => $quests]);
+        return array_merge($this->jsonSerialize(), [
+            'images' => $this->images->toArray(),
+            'quests' => $quests
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Exception\AlreadyVerifiedException;
 use App\Exception\BadRequestException;
 use App\Repository\UserRepository;
 use App\Service\FractalService;
+use App\Service\GameService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Firebase\JWT\JWT;
@@ -169,6 +170,20 @@ class MainController extends ApiController
     }
 
     /**
+     * @Route("get-games-filters", name="get-games-filters", methods={"GET"})
+     *
+     * @param GameService $gameService
+     * @return JsonResponse
+     */
+    public function getGamesFilters(GameService $gameService): JsonResponse
+    {
+        return $this->json([
+            'type' => 'success',
+            'data' => $gameService->getGameFilters()
+        ]);
+    }
+
+    /**
      * @Route("get-verification-init-data", name="get-verification-init-data", methods={"GET"})
      *
      * @param Request $request
@@ -298,6 +313,7 @@ class MainController extends ApiController
      * @Route("service-login", methods={"OPTIONS"})
      * @Route("get-service-login-redirect", methods={"OPTIONS"})
      * @Route("get-blockchain-config", methods={"OPTIONS"})
+     * @Route("get-games-filters", methods={"OPTIONS"})
      * @Route("get-verification-init-data", methods={"OPTIONS"})
      * @Route("get-lew3lup-id-minting-signature", methods={"OPTIONS"})
      * @Route("set-username", methods={"OPTIONS"})

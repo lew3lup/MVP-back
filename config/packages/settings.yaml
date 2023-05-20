@@ -4,3 +4,8 @@ parameters:
   jwtSecretKey: '%env(JWT_SECRET_KEY)%'
   eventsParsingIterations: '%env(EVENTS_PARSING_ITERATIONS)%'
   babtParsingIterations: '%env(BABT_PARSING_ITERATIONS)%'
+  imagesBucketName: 'lew3lup-images'
+  imagesRootDir: '%env(IMAGES_ROOT_DIR)%'
+  awsRegion: '%env(AWS_REGION)%'
+  awsAccessKeyId: '%env(AWS_ACCESS_KEY_ID)%'
+  awsSecretAccessKey: '%env(AWS_SECRET_ACCESS_KEY)%'

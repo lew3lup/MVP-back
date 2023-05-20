@@ -7,15 +7,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Сущность ачивки
+ * Сущность категории
  *
- * @ORM\Table(name="achievements")
- * @ORM\Entity(repositoryClass="App\Repository\AchievementRepository")
+ * @ORM\Table(name="categories")
+ * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  *
- * Class Achievement
+ * Class Category
  * @package App\Entity
  */
-class Achievement extends Descriptionable
+class Category extends Descriptionable
 {
     /**
      * @var int
@@ -25,33 +25,25 @@ class Achievement extends Descriptionable
      */
     private $id;
     /**
-     * @var UserAchievement[]
-     * @ORM\OneToMany(targetEntity="UserAchievement", mappedBy="achievement")
+     * @var GameCategory[]
+     * @ORM\OneToMany(targetEntity="GameCategory", mappedBy="category")
      */
-    private $userAchievements;
+    private $gameCategories;
 
     /**
-     * Achievement constructor.
+     * Category constructor.
      */
     public function __construct()
     {
-        $this->userAchievements = new ArrayCollection();
+        $this->gameCategories = new ArrayCollection();
     }
 
     /**
-     * @return int
+     * @return GameCategory[]|Collection
      */
-    public function getId(): int
+    public function getGameCategories(): Collection
     {
-        return $this->id;
-    }
-
-    /**
-     * @return Collection|UserAchievement[]
-     */
-    public function getUserAchievements(): Collection
-    {
-        return $this->userAchievements;
+        return $this->gameCategories;
     }
 
     /**

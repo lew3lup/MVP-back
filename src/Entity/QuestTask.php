@@ -52,11 +52,6 @@ class QuestTask extends Descriptionable
      */
     private $deletedAt;
     /**
-     * @var QuestTaskDescription[]
-     * @ORM\OneToMany(targetEntity="QuestTaskDescription", mappedBy="questTask")
-     */
-    private $descriptions;
-    /**
      * @var UserQuestTask[]
      * @ORM\OneToMany(targetEntity="UserQuestTask", mappedBy="questTask")
      */
@@ -168,7 +163,8 @@ class QuestTask extends Descriptionable
     {
         return [
             'id'            => $this->id,
-            'descriptions'  => $this->descriptions->toArray(),
+            'name'          => $this->name,
+            'description'   => $this->description,
         ];
     }
 

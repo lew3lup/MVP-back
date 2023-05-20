@@ -2,8 +2,6 @@
 
 namespace App\Exception;
 
-use DomainException;
-
 class IncorrectEthAddressException extends BadRequestException
 {
     /**

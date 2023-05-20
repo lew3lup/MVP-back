@@ -4,11 +4,12 @@ namespace App\Controller;
 
 use App\Exception\BadRequestException;
 use App\Exception\ConflictException;
-use App\Service\DescriptionService;
 use App\Service\GameService;
+use App\Service\ImageService;
 use App\Service\QuestService;
 use App\Service\QuestTaskService;
 use Doctrine\ORM\EntityManagerInterface;
+use DomainException;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,38 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GameAdminController extends ApiController
 {
+    /**
+     * @Route("add-game", methods={"POST"})
+     *
+     * @param Request $request
+     * @param GameService $gameService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function addGame(
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $em->beginTransaction();
+        try {
+            $game = $gameService->addGame($this->getCurrentUser($request), $this->getRequestData($request));
+            $em->flush();
+            $em->commit();
+        } catch (DomainException $e) {
+            $em->rollback();
+            throw $e;
+        } catch (Exception $e) {
+            $em->rollback();
+            $this->logger->error($e);
+            throw new ConflictException('PATH_IS_ALREADY_IN_USE');
+        }
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
     /**
      * @Route("game/{gameId}", methods={"GET"})
      *
@@ -61,6 +94,40 @@ class GameAdminController extends ApiController
             $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
             $this->getRequestData($request)
         );
+        try {
+            $em->flush();
+        } catch (Exception $e) {
+            throw new ConflictException('PATH_IS_ALREADY_IN_USE');
+        }
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
+    /**
+     * @Route("game/{gameId}/logo", methods={"POST"})
+     *
+     * @param int $gameId
+     * @param Request $request
+     * @param GameService $gameService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function setGameLogo(
+        int $gameId,
+        Request $request,
+        GameService $gameService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $file = $request->files->get('logo');
+        if (!$file) {
+            throw new BadRequestException();
+        }
+        $game = $gameService->setGameLogo(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            $file
+        );
         $em->flush();
         return $this->json([
             'type' => 'success',
@@ -69,85 +136,78 @@ class GameAdminController extends ApiController
     }
 
     /**
-     * @Route("game/{gameId}/add-description", methods={"POST"})
+     * @Route("game/{gameId}/logo", methods={"DELETE"})
      *
      * @param int $gameId
      * @param Request $request
      * @param GameService $gameService
-     * @param DescriptionService $descriptionService
      * @param EntityManagerInterface $em
      * @return JsonResponse
      */
-    public function addGameDescription(
+    public function removeGameLogo(
         int $gameId,
         Request $request,
         GameService $gameService,
-        DescriptionService $descriptionService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $description = $descriptionService->addGameDescription(
-            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
-            $this->getRequestData($request)
-        );
-        try {
-            $em->flush();
-        } catch (Exception $e) {
-            throw new ConflictException();
-        }
-        return $this->json([
-            'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
-        ]);
-    }
-
-    /**
-     * @Route("game-description/{gameDescriptionId}", methods={"PUT"})
-     *
-     * @param int $gameDescriptionId
-     * @param Request $request
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function updateGameDescription(
-        int $gameDescriptionId,
-        Request $request,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $description = $descriptionService->updateDescription(
-            $descriptionService->getGameDescriptionByIdAndAdminId(
-                $gameDescriptionId,
-                $this->getCurrentUser($request)->getId()
-            ),
-            $this->getRequestData($request)
+        $game = $gameService->removeGameLogo(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId())
         );
         $em->flush();
         return $this->json([
             'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
+            'data' => $game->jsonSerializeDetailed()
         ]);
     }
 
     /**
-     * @Route("game-description/{gameDescriptionId}", methods={"DELETE"})
+     * @Route("game/{gameId}/add-image", methods={"POST"})
      *
-     * @param int $gameDescriptionId
+     * @param int $gameId
      * @param Request $request
-     * @param DescriptionService $descriptionService
+     * @param GameService $gameService
      * @param EntityManagerInterface $em
      * @return JsonResponse
      */
-    public function removeGameDescription(
-        int $gameDescriptionId,
+    public function addGameImage(
+        int $gameId,
         Request $request,
-        DescriptionService $descriptionService,
+        GameService $gameService,
         EntityManagerInterface $em
     ): JsonResponse {
-        $em->remove($descriptionService->getGameDescriptionByIdAndAdminId(
-            $gameDescriptionId,
-            $this->getCurrentUser($request)->getId()
-        ));
+        $file = $request->files->get('image');
+        if (!$file) {
+            throw new BadRequestException();
+        }
+        $game = $gameService->addGameImage(
+            $gameService->getByIdAndAdminId($gameId, $this->getCurrentUser($request)->getId()),
+            $file
+        );
+        $em->flush();
+        return $this->json([
+            'type' => 'success',
+            'data' => $game->jsonSerializeDetailed()
+        ]);
+    }
+
+    /**
+     * @Route("image/{imageId}", methods={"DELETE"})
+     *
+     * @param int $imageId
+     * @param Request $request
+     * @param ImageService $imageService
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function removeImage(
+        int $imageId,
+        Request $request,
+        ImageService $imageService,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $imageService->removeImage(
+            $imageService->getByIdAndAdminId($imageId, $this->getCurrentUser($request)->getId())
+        );
         $em->flush();
         return $this->json(['type' => 'success']);
     }
@@ -227,90 +287,6 @@ class GameAdminController extends ApiController
     }
 
     /**
-     * @Route("quest/{questId}/add-description", methods={"POST"})
-     *
-     * @param int $questId
-     * @param Request $request
-     * @param QuestService $questService
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function addQuestDescription(
-        int $questId,
-        Request $request,
-        QuestService $questService,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $description = $descriptionService->addQuestDescription(
-            $questService->getByIdAndAdminId($questId, $this->getCurrentUser($request)->getId()),
-            $this->getRequestData($request)
-        );
-        try {
-            $em->flush();
-        } catch (Exception $e) {
-            throw new ConflictException();
-        }
-        return $this->json([
-            'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
-        ]);
-    }
-
-    /**
-     * @Route("quest-description/{questDescriptionId}", methods={"PUT"})
-     *
-     * @param int $questDescriptionId
-     * @param Request $request
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function updateQuestDescription(
-        int $questDescriptionId,
-        Request $request,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $description = $descriptionService->updateDescription(
-            $descriptionService->getQuestDescriptionByIdAndAdminId(
-                $questDescriptionId,
-                $this->getCurrentUser($request)->getId()
-            ),
-            $this->getRequestData($request)
-        );
-        $em->flush();
-        return $this->json([
-            'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
-        ]);
-    }
-
-    /**
-     * @Route("quest-description/{questDescriptionId}", methods={"DELETE"})
-     *
-     * @param int $questDescriptionId
-     * @param Request $request
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function removeQuestDescription(
-        int $questDescriptionId,
-        Request $request,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $em->remove($descriptionService->getQuestDescriptionByIdAndAdminId(
-            $questDescriptionId,
-            $this->getCurrentUser($request)->getId()
-        ));
-        $em->flush();
-        return $this->json(['type' => 'success']);
-    }
-
-    /**
      * @Route("quest/{questId}/add-task", methods={"POST"})
      *
      * @param int $questId
@@ -384,106 +360,20 @@ class GameAdminController extends ApiController
     }
 
     /**
-     * @Route("task/{questTaskId}/add-description", methods={"POST"})
-     *
-     * @param int $questTaskId
-     * @param Request $request
-     * @param QuestTaskService $questTaskService
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function addQuestTaskDescription(
-        int $questTaskId,
-        Request $request,
-        QuestTaskService $questTaskService,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $description = $descriptionService->addQuestTaskDescription(
-            $questTaskService->getByIdAndAdminId($questTaskId, $this->getCurrentUser($request)->getId()),
-            $this->getRequestData($request)
-        );
-        try {
-            $em->flush();
-        } catch (Exception $e) {
-            throw new ConflictException();
-        }
-        return $this->json([
-            'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
-        ]);
-    }
-
-    /**
-     * @Route("task-description/{questTaskDescriptionId}", methods={"PUT"})
-     *
-     * @param int $questTaskDescriptionId
-     * @param Request $request
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function updateQuestTaskDescription(
-        int $questTaskDescriptionId,
-        Request $request,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $description = $descriptionService->updateDescription(
-            $descriptionService->getQuestTaskDescriptionByIdAndAdminId(
-                $questTaskDescriptionId,
-                $this->getCurrentUser($request)->getId()
-            ),
-            $this->getRequestData($request)
-        );
-        $em->flush();
-        return $this->json([
-            'type' => 'success',
-            'data' => $description->jsonSerializeDetailed()
-        ]);
-    }
-
-    /**
-     * @Route("task-description/{questTaskDescriptionId}", methods={"DELETE"})
-     *
-     * @param int $questTaskDescriptionId
-     * @param Request $request
-     * @param DescriptionService $descriptionService
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     */
-    public function removeQuestTaskDescription(
-        int $questTaskDescriptionId,
-        Request $request,
-        DescriptionService $descriptionService,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $em->remove($descriptionService->getQuestTaskDescriptionByIdAndAdminId(
-            $questTaskDescriptionId,
-            $this->getCurrentUser($request)->getId()
-        ));
-        $em->flush();
-        return $this->json(['type' => 'success']);
-    }
-
-    /**
+     * @Route("add-game", methods={"OPTIONS"})
      * @Route("game/{gameId}", methods={"OPTIONS"})
-     * @Route("game/{gameId}/add-description", methods={"OPTIONS"})
-     * @Route("game-description/{gameDescriptionId}", methods={"OPTIONS"})
+     * @Route("game/{gameId}/logo", methods={"OPTIONS"})
+     * @Route("game/{gameId}/add-image", methods={"OPTIONS"})
+     * @Route("image/{imageId}", methods={"OPTIONS"})
      * @Route("game/{gameId}/add-quest", methods={"OPTIONS"})
      * @Route("quest/{questId}", methods={"OPTIONS"})
-     * @Route("quest/{questId}/add-description", methods={"OPTIONS"})
-     * @Route("quest-description/{questDescriptionId}", methods={"OPTIONS"})
      * @Route("quest/{questId}/add-task", methods={"OPTIONS"})
      * @Route("task/{questTaskId}", methods={"OPTIONS"})
-     * @Route("task/{questTaskId}/add-description", methods={"OPTIONS"})
-     * @Route("task-description/{questTaskDescriptionId}", methods={"OPTIONS"})
      */
     public function options(): Response
     {
         $response = new Response();
-        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+        $response->headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE');
         return $response;
     }
 
